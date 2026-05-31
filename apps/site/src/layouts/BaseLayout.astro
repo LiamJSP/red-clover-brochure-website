@@ -1,0 +1,98 @@
+---
+import '../styles/global.css';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import SeoHead from '../components/SeoHead.astro';
+import type { SiteSetting } from '@red-clover/cms/payload-types';
+
+interface Props {
+  settings: SiteSetting;
+  pathname: string;
+  title: string;
+  description: string;
+  image?: string;
+  type?: 'website' | 'article';
+  articlePublishedTime?: string | null;
+  jsonLd?: Record<string, unknown>[] | Record<string, unknown> | null;
+}
+
+const {
+  settings,
+  pathname,
+  title,
+  description,
+  image,
+  type = 'website',
+  articlePublishedTime = null,
+  jsonLd = null,
+} = Astro.props as Props;
+
+const enableSwCleanup = import.meta.env.PUBLIC_ENABLE_SW_CLEANUP === 'true';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SeoHead
+      settings={settings}
+      title={title}
+      description={description}
+      pathname={pathname}
+      image={image}
+      type={type}
+      articlePublishedTime={articlePublishedTime}
+      jsonLd={jsonLd}
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+
+  <body>
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <div class="min-h-screen">
+      <Header settings={settings} pathname={pathname} />
+      <main id="main">
+        <slot />
+      </main>
+      <Footer settings={settings} />
+    </div>
+
+    {
+      enableSwCleanup && (
+        <script is:inline>
+          {`
+          (function () {
+            try {
+              if (localStorage.getItem('rc-sw-cleanup-v1') === 'done') return;
+            } catch (error) {}
+
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations()
+                .then(function (registrations) {
+                  return Promise.all(registrations.map(function (registration) {
+                    return registration.unregister();
+                  }));
+                })
+                .catch(function () {});
+            }
+
+            if ('caches' in window) {
+              caches.keys()
+                .then(function (keys) {
+                  return Promise.all(keys.map(function (key) {
+                    return caches.delete(key);
+                  }));
+                })
+                .catch(function () {});
+            }
+
+            try {
+              localStorage.setItem('rc-sw-cleanup-v1', 'done');
+            } catch (error) {}
+          })();
+        `}
+        </script>
+      )
+    }
+  </body>
+</html>

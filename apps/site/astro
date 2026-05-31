@@ -1,0 +1,274 @@
+
+> @red-clover/site@ typecheck /home/local/red-clover-brochure-mvp/apps/site
+> astro check "output.txt"
+
+21:32:21 [content] Syncing content
+21:32:21 [content] Synced content
+21:32:21 [types] Generated 32ms
+21:32:21 [check] Getting diagnostics for Astro files in /home/local/red-clover-brochure-mvp/apps/site...
+[96msrc/components/CaseStudyCard.astro[0m:[93m2[0m:[93m35[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../lib/types' or its corresponding type declarations.
+
+[7m2[0m import type { CaseStudy } from '../lib/types';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~[0m
+
+[96msrc/components/PageView.astro[0m:[93m6[0m:[93m44[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../lib/types' or its corresponding type declarations.
+
+[7m6[0m import type { Page, SiteSetting } from '../lib/types';
+[7m [0m [91m                                           ~~~~~~~~~~~~~~[0m
+
+[96msrc/components/Footer.astro[0m:[93m102[0m:[93m19[0m - [91merror[0m[90m ts(2322): [0mType '{ children: any; key: any; class: string; }' is not assignable to type 'LiHTMLAttributes'.
+  Property 'key' does not exist on type 'LiHTMLAttributes'.
+
+[7m102[0m                   key={index}
+[7m   [0m [91m                  ~~~[0m
+[96msrc/components/Footer.astro[0m:[93m94[0m:[93m54[0m - [91merror[0m[90m ts(7006): [0mParameter 'index' implicitly has an 'any' type.
+
+[7m94[0m             settings.phone.split('/').map((phoneNum, index) => {
+[7m  [0m [91m                                                     ~~~~~[0m
+[96msrc/components/Footer.astro[0m:[93m94[0m:[93m44[0m - [91merror[0m[90m ts(7006): [0mParameter 'phoneNum' implicitly has an 'any' type.
+
+[7m94[0m             settings.phone.split('/').map((phoneNum, index) => {
+[7m  [0m [91m                                           ~~~~~~~~[0m
+[96msrc/components/Footer.astro[0m:[93m7[0m:[93m35[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../lib/types' or its corresponding type declarations.
+
+[7m7[0m import type { SiteSetting } from '../lib/types';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~[0m
+[96msrc/components/Footer.astro[0m:[93m3[0m:[93m3[0m - [93mwarning[0m[90m ts(6133): [0m'footerNavigation' is declared but its value is never read.
+
+[7m3[0m   footerNavigation,
+[7m [0m [93m  ~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/Header.astro[0m:[93m4[0m:[93m35[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { SiteSetting } from '../lib/types';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~[0m
+
+[96msrc/components/PageHero.astro[0m:[93m4[0m:[93m44[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { Page, SiteSetting } from '../lib/types';
+[7m [0m [91m                                           ~~~~~~~~~~~~~~[0m
+
+[96msrc/components/PostCard.astro[0m:[93m3[0m:[93m30[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../lib/types' or its corresponding type declarations.
+
+[7m3[0m import type { Post } from '../lib/types';
+[7m [0m [91m                             ~~~~~~~~~~~~~~[0m
+
+[96msrc/components/SeoHead.astro[0m:[93m3[0m:[93m35[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../lib/types' or its corresponding type declarations.
+
+[7m3[0m import type { SiteSetting } from '../lib/types';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~[0m
+[96msrc/components/SeoHead.astro[0m:[93m79[0m:[93m13[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m79[0m     <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+[7m  [0m [93m            ~~~~[0m
+[96msrc/components/SeoHead.astro[0m:[93m74[0m:[93m3[0m - [93mwarning[0m[90m astro(4000): [0mThis script will be treated as if it has the `is:inline` directive because it contains an attribute. Therefore, features that require processing (e.g. using TypeScript or npm packages in the script) are unavailable.
+
+See docs for more details: https://docs.astro.build/en/guides/client-side-scripts/#script-processing.
+
+Add the `is:inline` directive explicitly to silence this hint.
+
+[7m74[0m   type="application/ld+json"
+[7m  [0m [93m  ~~~~[0m
+
+[96msrc/components/blocks/ArchiveBlock.astro[0m:[93m30[0m:[93m28[0m - [91merror[0m[90m ts(7006): [0mParameter 'post' implicitly has an 'any' type.
+
+[7m30[0m       {postsToDisplay.map((post) => <PostCard post={post} />)}
+[7m  [0m [91m                           ~~~~[0m
+
+[96msrc/components/blocks/BlockRenderer.astro[0m:[93m2[0m:[93m32[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m2[0m import type { PageBlock } from '../../lib/types';
+[7m [0m [91m                               ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/BulletListSection.astro[0m:[93m25[0m:[93m26[0m - [91merror[0m[90m ts(7006): [0mParameter 'item' implicitly has an 'any' type.
+
+[7m25[0m         block.items.map((item) => {
+[7m  [0m [91m                         ~~~~[0m
+[96msrc/components/blocks/BulletListSection.astro[0m:[93m6[0m:[93m38[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m6[0m import type { BulletListBlock } from '../../lib/types';
+[7m [0m [91m                                     ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/CTABandSection.astro[0m:[93m21[0m:[93m31[0m - [91merror[0m[90m ts(7053): [0mElement implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ plum: string; green: string; neutral: string; }'.
+
+[7m21[0m <section class:list={['py-8', toneClasses[tone] || toneClasses.plum]}>
+[7m  [0m [91m                              ~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/blocks/CTABandSection.astro[0m:[93m4[0m:[93m35[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { CTABandBlock } from '../../lib/types';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/CTABlock.astro[0m:[93m4[0m:[93m57[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { CTABlock as CTABlockType, LinkData } from '../../lib/types';
+[7m [0m [91m                                                        ~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/blocks/CTABlock.astro[0m:[93m3[0m:[93m10[0m - [91merror[0m[90m ts(2305): [0mModule '"../../lib/markdown"' has no exported member 'lexicalToHtml'.
+
+[7m3[0m import { lexicalToHtml } from '../../lib/markdown';
+[7m [0m [91m         ~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/CaseStudyHighlightsSection.astro[0m:[93m23[0m:[93m40[0m - [91merror[0m[90m ts(7006): [0mParameter 'study' implicitly has an 'any' type.
+
+[7m23[0m         block.selectedCaseStudies.map((study) => (
+[7m  [0m [91m                                       ~~~~~[0m
+[96msrc/components/blocks/CaseStudyHighlightsSection.astro[0m:[93m4[0m:[93m47[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { CaseStudyHighlightsBlock } from '../../lib/types';
+[7m [0m [91m                                              ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/ContactMethodsSection.astro[0m:[93m94[0m:[93m39[0m - [91merror[0m[90m ts(7006): [0mParameter 'item' implicitly has an 'any' type.
+
+[7m94[0m           {block.responseWindows.map((item) => (
+[7m  [0m [91m                                      ~~~~[0m
+[96msrc/components/blocks/ContactMethodsSection.astro[0m:[93m4[0m:[93m42[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { ContactMethodsBlock } from '../../lib/types';
+[7m [0m [91m                                         ~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/blocks/ContactMethodsSection.astro[0m:[93m23[0m:[93m7[0m - [93mwarning[0m[90m ts(6133): [0m'gridClass' is declared but its value is never read.
+
+[7m23[0m const gridClass =
+[7m  [0m [93m      ~~~~~~~~~[0m
+
+[96msrc/components/blocks/ContentBlock.astro[0m:[93m17[0m:[93m28[0m - [91merror[0m[90m ts(7006): [0mParameter 'col' implicitly has an 'any' type.
+
+[7m17[0m         block.columns.map((col) => {
+[7m  [0m [91m                           ~~~[0m
+[96msrc/components/blocks/ContentBlock.astro[0m:[93m4[0m:[93m55[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { ContentBlock as ContentBlockType } from '../../lib/types';
+[7m [0m [91m                                                      ~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/blocks/ContentBlock.astro[0m:[93m3[0m:[93m10[0m - [91merror[0m[90m ts(2305): [0mModule '"../../lib/markdown"' has no exported member 'lexicalToHtml'.
+
+[7m3[0m import { lexicalToHtml } from '../../lib/markdown';
+[7m [0m [91m         ~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/FAQSection.astro[0m:[93m23[0m:[93m26[0m - [91merror[0m[90m ts(7006): [0mParameter 'item' implicitly has an 'any' type.
+
+[7m23[0m         block.items.map((item) => (
+[7m  [0m [91m                         ~~~~[0m
+[96msrc/components/blocks/FAQSection.astro[0m:[93m4[0m:[93m31[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { FAQBlock } from '../../lib/types';
+[7m [0m [91m                              ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/FeatureGridSection.astro[0m:[93m30[0m:[93m26[0m - [91merror[0m[90m ts(7006): [0mParameter 'item' implicitly has an 'any' type.
+
+[7m30[0m         block.items.map((item) => (
+[7m  [0m [91m                         ~~~~[0m
+[96msrc/components/blocks/FeatureGridSection.astro[0m:[93m8[0m:[93m39[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m8[0m import type { FeatureGridBlock } from '../../lib/types';
+[7m [0m [91m                                      ~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/blocks/FeatureGridSection.astro[0m:[93m90[0m:[93m20[0m - [91merror[0m[90m ts(7005): [0mVariable 'timeoutId' implicitly has an 'any' type.
+
+[7m90[0m       clearTimeout(timeoutId);
+[7m  [0m [91m                   ~~~~~~~~~[0m
+[96msrc/components/blocks/FeatureGridSection.astro[0m:[93m88[0m:[93m9[0m - [91merror[0m[90m ts(7034): [0mVariable 'timeoutId' implicitly has type 'any' in some locations where its type cannot be determined.
+
+[7m88[0m     let timeoutId;
+[7m  [0m [91m        ~~~~~~~~~[0m
+[96msrc/components/blocks/FeatureGridSection.astro[0m:[93m82[0m:[93m36[0m - [91merror[0m[90m ts(2339): [0mProperty 'style' does not exist on type 'Element'.
+
+[7m82[0m       paragraphs.forEach((p) => (p.style.minHeight = `${maxParaHeight}px`));
+[7m  [0m [91m                                   ~~~~~[0m
+[96msrc/components/blocks/FeatureGridSection.astro[0m:[93m74[0m:[93m34[0m - [91merror[0m[90m ts(2339): [0mProperty 'style' does not exist on type 'Element'.
+
+[7m74[0m       headings.forEach((h) => (h.style.minHeight = `${maxHeadingHeight}px`));
+[7m  [0m [91m                                 ~~~~~[0m
+[96msrc/components/blocks/FeatureGridSection.astro[0m:[93m66[0m:[93m36[0m - [91merror[0m[90m ts(2339): [0mProperty 'style' does not exist on type 'Element'.
+
+[7m66[0m       paragraphs.forEach((p) => (p.style.minHeight = ''));
+[7m  [0m [91m                                   ~~~~~[0m
+[96msrc/components/blocks/FeatureGridSection.astro[0m:[93m65[0m:[93m34[0m - [91merror[0m[90m ts(2339): [0mProperty 'style' does not exist on type 'Element'.
+
+[7m65[0m       headings.forEach((h) => (h.style.minHeight = ''));
+[7m  [0m [91m                                 ~~~~~[0m
+
+[96msrc/components/blocks/MarkdownSection.astro[0m:[93m22[0m:[93m32[0m - [91merror[0m[90m ts(7053): [0mElement implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ default: string; muted: string; accent: string; }'.
+
+[7m22[0m <section class:list={['py-10', toneClasses[tone] || '']}>
+[7m  [0m [91m                               ~~~~~~~~~~~~~~~~~[0m
+[96msrc/components/blocks/MarkdownSection.astro[0m:[93m4[0m:[93m43[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { MarkdownSectionBlock } from '../../lib/types';
+[7m [0m [91m                                          ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/MediaBlockComponent.astro[0m:[93m2[0m:[93m51[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m2[0m import type { MediaBlock as MediaBlockType } from '../../lib/types';
+[7m [0m [91m                                                  ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/PricingTiersSection.astro[0m:[93m49[0m:[93m35[0m - [91merror[0m[90m ts(7006): [0mParameter 'feature' implicitly has an 'any' type.
+
+[7m49[0m               {tier.features.map((feature) => (
+[7m  [0m [91m                                  ~~~~~~~[0m
+[96msrc/components/blocks/PricingTiersSection.astro[0m:[93m23[0m:[93m26[0m - [91merror[0m[90m ts(7006): [0mParameter 'tier' implicitly has an 'any' type.
+
+[7m23[0m         block.tiers.map((tier) => (
+[7m  [0m [91m                         ~~~~[0m
+[96msrc/components/blocks/PricingTiersSection.astro[0m:[93m4[0m:[93m40[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m4[0m import type { PricingTiersBlock } from '../../lib/types';
+[7m [0m [91m                                       ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/components/blocks/TimelineSection.astro[0m:[93m56[0m:[93m26[0m - [91merror[0m[90m ts(7006): [0mParameter 'step' implicitly has an 'any' type.
+
+[7m56[0m         mappedSteps.map((step) => (
+[7m  [0m [91m                         ~~~~[0m
+[96msrc/components/blocks/TimelineSection.astro[0m:[93m15[0m:[93m44[0m - [91merror[0m[90m ts(7006): [0mParameter 'index' implicitly has an 'any' type.
+
+[7m15[0m const mappedSteps = block.steps.map((step, index) => {
+[7m  [0m [91m                                           ~~~~~[0m
+[96msrc/components/blocks/TimelineSection.astro[0m:[93m15[0m:[93m38[0m - [91merror[0m[90m ts(7006): [0mParameter 'step' implicitly has an 'any' type.
+
+[7m15[0m const mappedSteps = block.steps.map((step, index) => {
+[7m  [0m [91m                                     ~~~~[0m
+[96msrc/components/blocks/TimelineSection.astro[0m:[93m3[0m:[93m36[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../../lib/types' or its corresponding type declarations.
+
+[7m3[0m import type { TimelineBlock } from '../../lib/types';
+[7m [0m [91m                                   ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/layouts/BaseLayout.astro[0m:[93m6[0m:[93m35[0m - [91merror[0m[90m ts(2307): [0mCannot find module '../lib/types' or its corresponding type declarations.
+
+[7m6[0m import type { SiteSetting } from '../lib/types';
+[7m [0m [91m                                  ~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/markdown.ts[0m:[93m2[0m:[93m26[0m - [91merror[0m[90m ts(7016): [0mCould not find a declaration file for module 'sanitize-html'. '/home/local/red-clover-brochure-mvp/node_modules/.pnpm/sanitize-html@2.17.1/node_modules/sanitize-html/index.js' implicitly has an 'any' type.
+  Try `npm i --save-dev @types/sanitize-html` if it exists or add a new declaration (.d.ts) file containing `declare module 'sanitize-html';`
+
+[7m2[0m import sanitizeHtml from 'sanitize-html';
+[7m [0m [91m                         ~~~~~~~~~~~~~~~[0m
+
+[96msrc/lib/utils.ts[0m:[93m1[0m:[93m35[0m - [91merror[0m[90m ts(2307): [0mCannot find module './types' or its corresponding type declarations.
+
+[7m1[0m import type { SiteSetting } from './types';
+[7m [0m [91m                                  ~~~~~~~~~[0m
+
+[96msrc/pages/rss.xml.ts[0m:[93m4[0m:[93m27[0m - [91merror[0m[90m ts(7006): [0mParameter 'context' implicitly has an 'any' type.
+
+[7m4[0m export async function GET(context) {
+[7m [0m [91m                          ~~~~~~~[0m
+
+[96msrc/pages/news/index.astro[0m:[93m10[0m:[93m18[0m - [93mwarning[0m[90m ts(6133): [0m'posts' is declared but its value is never read.
+
+[7m10[0m const [settings, posts, page] = await Promise.all([
+[7m  [0m [93m                 ~~~~~[0m
+[96msrc/pages/news/index.astro[0m:[93m6[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'SectionIntro' is declared but its value is never read.
+
+[7m6[0m import SectionIntro from '../../components/SectionIntro.astro';
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96msrc/pages/news/index.astro[0m:[93m4[0m:[93m1[0m - [93mwarning[0m[90m ts(6133): [0m'PostCard' is declared but its value is never read.
+
+[7m4[0m import PostCard from '../../components/PostCard.astro';
+[7m [0m [93m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+Result (44 files): 
+- 49 errors
+- 0 warnings
+- 7 hints
+
+ ELIFECYCLE  Command failed with exit code 1.

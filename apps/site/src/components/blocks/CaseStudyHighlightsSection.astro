@@ -1,0 +1,33 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import CaseStudyCard from '../CaseStudyCard.astro';
+import type { Page, CaseStudy } from '@red-clover/cms/payload-types';
+
+type LayoutBlock = NonNullable<Page['layout']>[number];
+type CaseStudyHighlightsBlock = Extract<LayoutBlock, { blockType: 'caseStudyHighlights' }>;
+
+interface Props {
+  block: CaseStudyHighlightsBlock;
+}
+
+const { block } = Astro.props as Props;
+---
+
+<section class="py-10">
+  <div class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+    <SectionIntro
+      eyebrow={block.eyebrow}
+      heading={block.heading}
+      intro={block.intro}
+    />
+
+    <div class="grid grid-cols-1 gap-4 min-[761px]:grid-cols-3">
+      {
+        block.selectedCaseStudies.map((study) => {
+          if (typeof study === 'number') return null;
+          return <CaseStudyCard study={study as CaseStudy} />;
+        })
+      }
+    </div>
+  </div>
+</section>

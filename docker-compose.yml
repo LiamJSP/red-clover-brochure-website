@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: red-clover-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: payload
+      POSTGRES_USER: payload
+      POSTGRES_PASSWORD: payload
+    ports:
+      - '5432:5432'
+    volumes:
+      - red-clover-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U payload -d payload']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  red-clover-pgdata:

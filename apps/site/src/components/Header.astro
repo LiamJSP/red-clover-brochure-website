@@ -1,0 +1,274 @@
+---
+import ActionLink from './ActionLink.astro';
+import { primaryNavigation } from '../lib/navigation';
+import type { SiteSetting } from '@red-clover/cms/payload-types';
+
+interface Props {
+  settings: SiteSetting;
+  pathname: string;
+}
+
+const { settings, pathname } = Astro.props as Props;
+---
+
+<header
+  class="sticky top-0 z-50 border-b border-[rgba(15,15,18,0.06)] bg-[rgba(251,250,248,0.84)] backdrop-blur-[14px]"
+>
+  <div
+    class="mx-auto grid w-[min(1120px,calc(100%-2rem))] grid-cols-[auto_1fr_auto_auto] items-center gap-4 py-4 max-[980px]:grid-cols-[auto_1fr_auto]"
+  >
+    <a
+      href="/"
+      class="inline-flex items-center gap-3 no-underline"
+      aria-label={`${settings.brandName} home`}
+    >
+      {
+        settings.logo && typeof settings.logo !== 'number' ? (
+          <img
+            src={settings.logo.url || '/favicon.svg'}
+            alt={settings.logo.alt || settings.brandName}
+            class="h-auto max-h-[2.2rem] w-auto max-w-[12rem] object-contain"
+          />
+        ) : (
+          <img
+            src="/favicon.svg"
+            alt={settings.brandName}
+            class="h-auto max-h-[2.2rem] w-auto max-w-[12rem] object-contain"
+          />
+        )
+      }
+    </a>
+
+    <nav class="max-[980px]:hidden" aria-label="Primary">
+      <ul class="m-0 flex list-none justify-center gap-[1.35rem] p-0">
+        {
+          primaryNavigation.map((item) => (
+            <li>
+              <a
+                href={item.href}
+                class:list={[
+                  'text-[0.94rem] font-bold no-underline',
+                  pathname === item.href
+                    ? 'text-[var(--color-text)]'
+                    : 'text-[var(--color-text-soft)] hover:text-[var(--color-text)]',
+                ]}
+                aria-current={pathname === item.href ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="max-[980px]:hidden">
+      <ActionLink
+        href={`mailto:${import.meta.env.PUBLIC_CONTACT_EMAIL}`}
+        label="Contact Us"
+        variant="secondary"
+      />
+    </div>
+
+    <button
+      id="mobile-menu-toggle"
+      class="hidden h-16 cursor-pointer appearance-none items-center justify-center border-none bg-transparent outline-none max-[980px]:inline-flex"
+      aria-label="Toggle mobile menu"
+      aria-expanded="false"
+    >
+      <img src="/hamburger.svg" alt="Menu" class="h-16 w-16" />
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Slide-in Menu -->
+<div
+  id="mobile-menu"
+  class="pointer-events-none fixed inset-x-0 top-0 z-40 h-screen -translate-y-full bg-[#bb569e] transition-transform duration-300 ease-out"
+>
+  <div class="flex h-full items-center justify-center">
+    <nav
+      class="flex h-[50%] w-full flex-col items-center justify-between px-6 text-white"
+      aria-label="Mobile"
+    >
+      {
+        primaryNavigation.map((item) => (
+          <a
+            href={item.href}
+            class={`text-lg font-bold no-underline transition-opacity hover:opacity-80 ${pathname === item.href ? 'opacity-100' : 'opacity-80'}`}
+            aria-current={pathname === item.href ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+      <a
+        href={`mailto:${import.meta.env.PUBLIC_CONTACT_EMAIL}`}
+        class="text-lg font-bold no-underline transition-opacity hover:opacity-80"
+      >
+        Contact Us
+      </a>
+    </nav>
+  </div>
+</div>
+
+<script is:inline type="module">
+  import Matter from 'https://esm.sh/matter-js@0.19.0';
+
+  if (window.__leafMenuInitialized) exit;
+  window.__leafMenuInitialized = true;
+
+  window.addEventListener('load', () => {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    if (!toggle || !menu) return;
+
+    let physicsCleanup = null;
+    let leavesContainer = null;
+
+    const openMenu = () => {
+      menu.classList.remove('-translate-y-full', 'pointer-events-none');
+      menu.classList.add('translate-y-0', 'pointer-events-auto');
+      toggle.setAttribute('aria-expanded', 'true');
+      triggerLeafBurst();
+    };
+
+    const closeMenu = () => {
+      menu.classList.remove('translate-y-0', 'pointer-events-auto');
+      menu.classList.add('-translate-y-full', 'pointer-events-none');
+      toggle.setAttribute('aria-expanded', 'false');
+
+      if (leavesContainer) {
+        leavesContainer.style.transition = 'transform 0.3s ease-out';
+        leavesContainer.style.transform = 'translateY(-110vh)';
+        setTimeout(() => {
+          cleanupPhysics();
+          leavesContainer = null;
+        }, 300);
+      }
+    };
+
+    toggle.addEventListener('click', () => {
+      if (menu.classList.contains('translate-y-0')) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    });
+
+    menu.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    function triggerLeafBurst() {
+      if (physicsCleanup) cleanupPhysics();
+
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      const engine = Matter.Engine.create();
+      const world = engine.world;
+      engine.timing.timeScale = 0.7;
+
+      const ground = Matter.Bodies.rectangle(
+        width / 2,
+        height + 60,
+        width + 200,
+        120,
+        { isStatic: true }
+      );
+      Matter.World.add(world, ground);
+      Matter.Engine.run(engine);
+
+      leavesContainer = document.createElement('div');
+      leavesContainer.className =
+        'fixed inset-0 pointer-events-none z-[9999] overflow-hidden will-change-transform';
+      document.body.appendChild(leavesContainer);
+
+      const leaves = [];
+      const LEAF_COUNT = 22; // 🔽 Halved from 45
+      const SIZE_MIN = 18;
+      const SIZE_MAX = 38;
+
+      for (let i = 0; i < LEAF_COUNT; i++) {
+        const x = width / 2 + (Math.random() - 0.5) * 120;
+        const y = -40 - Math.random() * 60;
+        const size = SIZE_MIN + Math.random() * (SIZE_MAX - SIZE_MIN);
+        const radius = size / 2;
+
+        const body = Matter.Bodies.circle(x, y, radius, {
+          restitution: 0.1,
+          friction: 0.5,
+          density: 0.00025,
+          frictionAir: 0.025,
+          angle: Math.random() * Math.PI * 2,
+        });
+        Matter.World.add(world, body);
+
+        const el = document.createElement('img');
+        el.src = '/leaf.svg';
+        el.style.width = `${size}px`;
+        el.style.height = `${size}px`;
+        el.style.position = 'absolute';
+        el.style.transformOrigin = 'center center';
+        el.style.left = '0';
+        el.style.top = '0';
+        el.style.opacity = '1';
+        el.style.willChange = 'transform';
+        leavesContainer.appendChild(el);
+
+        leaves.push({ body, el, radius });
+      }
+
+      leaves.forEach(({ body }) => {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 3 + Math.random() * 6;
+        Matter.Body.setVelocity(body, {
+          x: Math.cos(angle) * speed,
+          y: -Math.abs(Math.sin(angle) * speed) * 0.6,
+        });
+        Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.1);
+      });
+
+      let syncRAF;
+      const sync = () => {
+        leaves.forEach(({ body, el, radius }) => {
+          // 🔼 Doubled lateral drift force
+          if (body.position.y < height - 50 && !body.isStatic) {
+            Matter.Body.applyForce(body, body.position, {
+              x: (Math.random() - 0.5) * 0.0005,
+              y: 0,
+            });
+            Matter.Body.setAngularVelocity(
+              body,
+              body.angularVelocity + (Math.random() - 0.5) * 0.004
+            );
+          }
+
+          el.style.transform = `translate(${body.position.x - radius}px, ${body.position.y - radius}px) rotate(${body.angle}rad)`;
+        });
+        syncRAF = requestAnimationFrame(sync);
+      };
+      syncRAF = requestAnimationFrame(sync);
+
+      setTimeout(() => {
+        leaves.forEach(({ body }) => Matter.Body.setStatic(body, true));
+        cancelAnimationFrame(syncRAF);
+      }, 3500);
+
+      physicsCleanup = () => {
+        cancelAnimationFrame(syncRAF);
+        Matter.World.clear(world);
+        Matter.Engine.clear(engine);
+        if (leavesContainer?.parentNode) leavesContainer.remove();
+      };
+    }
+
+    function cleanupPhysics() {
+      if (physicsCleanup) {
+        physicsCleanup();
+        physicsCleanup = null;
+      }
+    }
+  });
+</script>

@@ -1,0 +1,111 @@
+---
+import ActionLink from '../ActionLink.astro';
+import SectionIntro from '../SectionIntro.astro';
+import type { PricingTiersBlock } from '../../lib/types';
+
+interface Props {
+  block: PricingTiersBlock;
+}
+
+const { block } = Astro.props as Props;
+---
+
+<section class="bg-[rgba(255,255,255,0.6)] py-10">
+  <div class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+    <SectionIntro
+      eyebrow={block.eyebrow}
+      heading={block.heading}
+      intro={block.intro}
+    />
+
+    <div class="pricing-grid grid grid-cols-1 gap-4 min-[981px]:grid-cols-3">
+      {
+        block.tiers.map((tier) => (
+          <article
+            class:list={[
+              'flex flex-col gap-4 rounded-[18px] border bg-[rgba(255,255,255,0.9)] p-[1.35rem] shadow-[0_10px_30px_rgba(15,15,18,0.04)]',
+              tier.highlighted
+                ? 'border-[rgba(96,19,80,0.22)] shadow-[0_18px_40px_rgba(96,19,80,0.12)]'
+                : 'border-[rgba(15,15,18,0.08)]',
+            ]}
+          >
+            <div class="sync-tier-header">
+              <h3>{tier.name}</h3>
+              <p class="mb-[0.2rem] [font-family:var(--font-serif)] text-[1.9rem] text-[var(--color-plum)]">
+                {tier.priceLabel}
+              </p>
+              <p class="text-[var(--color-text-soft)]">{tier.tagline}</p>
+            </div>
+
+            <div class="sync-tier-response">
+              {tier.responseWindow && (
+                <p class="text-[var(--color-text-soft)]">
+                  <strong>Response:</strong> {tier.responseWindow}
+                </p>
+              )}
+            </div>
+
+            <ul class="m-0 flex-grow list-none p-0">
+              {tier.features.map((feature) => (
+                <li class="border-b border-[rgba(15,15,18,0.06)] py-[0.55rem]">
+                  {feature.feature}
+                </li>
+              ))}
+            </ul>
+
+            <div>
+              {tier.note && (
+                <p class="text-[var(--color-text-soft)]">{tier.note}</p>
+              )}
+            </div>
+
+            <div class="mt-auto">
+              {tier.ctaLabel && (
+                <ActionLink
+                  href={tier.ctaHref}
+                  label={tier.ctaLabel}
+                  variant={tier.highlighted ? 'primary' : 'secondary'}
+                />
+              )}
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  function syncHeights() {
+    const isDesktop = window.innerWidth >= 981;
+    const grids = document.querySelectorAll('.pricing-grid');
+
+    grids.forEach((grid) => {
+      const syncElements = (selector: string) => {
+        const elements = grid.querySelectorAll<HTMLElement>(selector);
+
+        // Always reset to auto first to allow natural shrink/grow on resize
+        elements.forEach((el) => (el.style.minHeight = 'auto'));
+
+        // Only enforce equal heights on desktop layout
+        if (isDesktop) {
+          let maxHeight = 0;
+          elements.forEach(
+            (el) => (maxHeight = Math.max(maxHeight, el.offsetHeight))
+          );
+          elements.forEach((el) => (el.style.minHeight = `${maxHeight}px`));
+        }
+      };
+
+      syncElements('.sync-tier-header');
+      syncElements('.sync-tier-response');
+    });
+  }
+
+  // Run on initial load and whenever the window resizes
+  window.addEventListener('resize', syncHeights);
+  document.addEventListener('DOMContentLoaded', syncHeights);
+
+  // If you use Astro View Transitions, uncomment the line below:
+  // document.addEventListener('astro:page-load', syncHeights);
+</script>

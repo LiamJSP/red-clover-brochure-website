@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CaseStudyCard from '../../components/CaseStudyCard.astro';
+import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
+import SectionIntro from '../../components/SectionIntro.astro';
+import {
+  getAllCaseStudies,
+  getPageByPath,
+  getSiteSetting,
+} from '../../lib/cms';
+import { buildPageTitle } from '../../lib/utils';
+
+const [settings, studies, page] = await Promise.all([
+  getSiteSetting(),
+  getAllCaseStudies(),
+  getPageByPath('/work'),
+]);
+
+if (!page) {
+  throw new Error('Work page not found in Payload CMS.');
+}
+
+const title = buildPageTitle(page.metaTitle || page.title, settings);
+const description =
+  page.metaDescription ||
+  page.summary ||
+  settings.defaultMetaDescription ||
+  settings.tagline;
+
+const pageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: page.title,
+  description,
+  url: new URL('/work', settings.siteUrl).toString(),
+};
+---
+
+<BaseLayout
+  settings={settings}
+  pathname="/work"
+  title={title}
+  description={description}
+  jsonLd={pageSchema}
+>
+  <PageHero page={page} settings={settings} />
+  <BlockRenderer blocks={page.layout || []} />
+
+  <section class="py-10">
+    <div class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+      <SectionIntro
+        eyebrow="Selected work"
+        heading="Representative cases for modernization, maintenance, and partner delivery"
+        intro="These stories are seeded as representative scenarios for the MVP and can be replaced with your real anonymized case studies in the CMS."
+      />
+
+      <div class="grid grid-cols-1 gap-4 min-[761px]:grid-cols-3">
+        {studies.map((study) => <CaseStudyCard study={study} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

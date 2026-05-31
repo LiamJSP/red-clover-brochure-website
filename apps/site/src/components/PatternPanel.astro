@@ -1,0 +1,101 @@
+---
+interface Props {
+  title?: string;
+  items?: { label: string }[];
+}
+
+const { title = 'What you get', items = [] } = Astro.props as Props;
+---
+
+<div
+  class="relative min-h-[22rem] overflow-hidden rounded-[28px] border border-[rgba(15,15,18,0.08)] bg-[rgba(255,255,255,0.88)] shadow-[0_18px_40px_rgba(15,15,18,0.06)] after:pointer-events-none after:absolute after:-right-[10%] after:-bottom-[18%] after:h-64 after:w-64 after:rounded-full after:content-[''] after:[background:radial-gradient(circle,rgba(234,148,204,0.18),transparent_65%)]"
+>
+  <svg
+    viewBox="0 0 520 320"
+    aria-hidden="true"
+    class="absolute inset-0 h-full w-full opacity-[0.85]"
+  >
+    <defs>
+      <linearGradient id="panelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="rgba(96,19,80,0.22)"></stop>
+        <stop offset="100%" stop-color="rgba(0,78,22,0.18)"></stop>
+      </linearGradient>
+    </defs>
+    <rect
+      x="0"
+      y="0"
+      width="520"
+      height="320"
+      rx="24"
+      fill="rgba(255,255,255,0.78)"></rect>
+    <path
+      d="M42 82 C128 32, 176 32, 250 84 S 380 140, 470 86"
+      fill="none"
+      stroke="rgba(96,19,80,0.25)"
+      stroke-width="2"></path>
+    <path
+      d="M54 218 C148 160, 205 170, 264 220 S 390 270, 470 220"
+      fill="none"
+      stroke="rgba(0,78,22,0.2)"
+      stroke-width="2"></path>
+    <path
+      d="M72 62 L170 112 L298 86 L420 136"
+      fill="none"
+      stroke="rgba(15,15,18,0.15)"
+      stroke-width="1.5"></path>
+    <path
+      d="M98 210 L170 148 L286 198 L410 154"
+      fill="none"
+      stroke="rgba(15,15,18,0.12)"
+      stroke-width="1.5"></path>
+    <circle cx="72" cy="62" r="8" fill="rgba(96,19,80,0.85)"></circle>
+    <circle cx="170" cy="112" r="8" fill="rgba(15,15,18,0.7)"></circle>
+    <circle cx="298" cy="86" r="8" fill="rgba(0,78,22,0.85)"></circle>
+    <circle cx="420" cy="136" r="8" fill="rgba(15,15,18,0.7)"></circle>
+    <circle cx="98" cy="210" r="8" fill="rgba(0,78,22,0.85)"></circle>
+    <circle cx="170" cy="148" r="8" fill="rgba(15,15,18,0.7)"></circle>
+    <circle cx="286" cy="198" r="8" fill="rgba(96,19,80,0.85)"></circle>
+    <circle cx="410" cy="154" r="8" fill="rgba(15,15,18,0.7)"></circle>
+    <rect
+      x="60"
+      y="248"
+      width="140"
+      height="24"
+      rx="12"
+      fill="rgba(96,19,80,0.09)"></rect>
+    <rect
+      x="220"
+      y="248"
+      width="110"
+      height="24"
+      rx="12"
+      fill="rgba(0,78,22,0.09)"></rect>
+    <rect
+      x="344"
+      y="248"
+      width="120"
+      height="24"
+      rx="12"
+      fill="rgba(15,15,18,0.08)"></rect>
+  </svg>
+
+  <div class="relative z-10 max-w-[22rem] p-[1.6rem]">
+    <p
+      class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-[var(--color-plum)] uppercase"
+    >
+      Operational maturity
+    </p>
+    <h3>{title}</h3>
+    {
+      items.length > 0 && (
+        <ul class="mt-4 list-none p-0">
+          {items.slice(0, 5).map((item) => (
+            <li class="border-b border-[rgba(15,15,18,0.06)] py-[0.55rem] text-[var(--color-text-soft)]">
+              {item.label}
+            </li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</div>

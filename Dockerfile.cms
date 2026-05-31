@@ -1,0 +1,35 @@
+FROM node:22-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+ENV PAYLOAD_SECRET="build-secret"
+ENV DATABASE_URL="postgres://payload:payload@localhost:5432/payload"
+ENV CMS_PUBLIC_URL="http://localhost:3000"
+ENV SITE_BASE_URL="http://localhost:4321"
+ENV CORS_ORIGINS="http://localhost:3000,http://localhost:4321"
+ENV SEED_ON_INIT="false"
+
+RUN corepack enable
+WORKDIR /app
+
+COPY package.json pnpm-workspace.yaml ./
+COPY apps/cms/package.json apps/cms/package.json
+COPY apps/site/package.json apps/site/package.json
+
+RUN pnpm install --filter cms... --no-frozen-lockfile
+
+COPY . .
+
+RUN pnpm --filter cms build
+
+FROM node:22-alpine AS runner
+ENV NODE_ENV=production
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+WORKDIR /app
+
+COPY --from=base /app /app
+
+EXPOSE 3000
+
+CMD ["pnpm", "--filter", "cms", "start"]

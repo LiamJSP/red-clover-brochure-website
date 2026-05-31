@@ -1,0 +1,79 @@
+---
+import ActionLink from './ActionLink.astro';
+import PhoneWorkPreview from './PhoneWorkPreview.astro';
+import type { Page, SiteSetting } from '@red-clover/cms/payload-types';
+
+interface Props {
+  page: Page;
+  settings: SiteSetting;
+}
+
+const { page } = Astro.props as Props;
+const hero = page.hero || {};
+
+const workPreviewStrip = hero.workPreviewStrip || null;
+const websitePreviewLabel = hero.websitePreviewLabel || 'Selected work preview';
+
+// Explicitly define grid behavior based on preview availability
+const gridClasses = workPreviewStrip
+  ? 'page-hero__grid mx-auto !grid w-[min(1120px,calc(100%-2rem))] grid-cols-1 items-center gap-8 lg:grid-cols-2'
+  : 'page-hero__grid mx-auto !grid w-[min(1120px,calc(100%-2rem))] grid-cols-1 items-center gap-8';
+---
+
+<section
+  class="page-hero overflow-x-hidden py-[4.5rem] pb-12 max-[760px]:pt-[3.5rem]"
+>
+  <div class={gridClasses}>
+    <div class="page-hero__content w-full">
+      {
+        hero.eyebrow && (
+          <p class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-[var(--color-plum)] uppercase">
+            {hero.eyebrow}
+          </p>
+        )
+      }
+
+      <h1>{hero.headline || page.title}</h1>
+
+      {
+        (hero.subheadline || page.summary) && (
+          <p class="max-w-[48rem] text-[clamp(1.1rem,2vw,1.3rem)] text-[var(--color-text-soft)]">
+            {hero.subheadline || page.summary}
+          </p>
+        )
+      }
+
+      {
+        (hero.primaryActionLabel || hero.secondaryActionLabel) && (
+          <div class="mt-6 flex flex-wrap gap-[0.85rem]">
+            {hero.primaryActionLabel && (
+              <ActionLink
+                href={hero.primaryActionHref}
+                label={hero.primaryActionLabel}
+                variant="primary"
+              />
+            )}
+            {hero.secondaryActionLabel && (
+              <ActionLink
+                href={hero.secondaryActionHref}
+                label={hero.secondaryActionLabel}
+                variant="ghost"
+              />
+            )}
+          </div>
+        )
+      }
+    </div>
+
+    {
+      workPreviewStrip && (
+        <div class="page-hero__preview flex w-full justify-center lg:justify-end">
+          <PhoneWorkPreview
+            image={workPreviewStrip as any}
+            label={websitePreviewLabel}
+          />
+        </div>
+      )
+    }
+  </div>
+</section>

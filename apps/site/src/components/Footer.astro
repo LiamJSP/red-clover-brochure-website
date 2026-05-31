@@ -1,0 +1,151 @@
+---
+import {
+  primaryNavigation,
+  serviceNavigation,
+} from '../lib/navigation';
+import type { SiteSetting } from '@red-clover/cms/payload-types';
+
+interface Props {
+  settings: SiteSetting;
+}
+
+const { settings } = Astro.props as Props;
+---
+
+<footer class="mt-8 border-t border-[rgba(15,15,18,0.08)] pt-8">
+  <div
+    class="mx-auto grid w-[min(1120px,calc(100%-2rem))] gap-[1.4rem] pb-[1.8rem] min-[981px]:grid-cols-[1.3fr_0.8fr_1fr_1fr]"
+  >
+    <div>
+      <a href="/" class="inline-flex items-center gap-[0.8rem] no-underline">
+        <span
+          class="inline-grid h-11 w-11 place-items-center rounded-[18px] border border-[rgba(15,15,18,0.08)] [font-family:var(--font-serif)] font-bold text-[var(--color-plum)] [background:linear-gradient(135deg,rgba(96,19,80,0.14),rgba(0,78,22,0.14)),var(--color-surface)]"
+        >
+          {settings.footerLogo && typeof settings.footerLogo !== 'number' ? (
+            <img
+              src={settings.footerLogo.url || '/favicon.svg'}
+              alt={settings.footerLogo.alt || settings.brandName}
+              class="h-auto max-h-[2rem] w-auto max-w-[2rem] object-contain"
+            />
+          ) : (
+            <img
+              src="/favicon.svg"
+              alt={settings.brandName}
+              class="h-auto max-h-[2rem] w-auto max-w-[2rem] object-contain"
+            />
+          )}
+        </span>
+        <span class="flex flex-col leading-[1.15]">
+          <strong class="text-base">{settings.brandName}</strong>
+          <span class="text-[0.83rem] text-[var(--color-text-soft)]"
+            >{settings.tagline}</span
+          >
+        </span>
+      </a>
+      <p class="text-[var(--color-text-soft)]">
+        {
+          settings.footerNote ||
+            'Senior execution, direct access, and delivery that is lean by design.'
+        }
+      </p>
+      <p class="font-semibold text-[var(--color-text)]">{settings.ownerLine}</p>
+    </div>
+
+    <div>
+      <h3>Explore</h3>
+      <ul class="m-0 list-none p-0">
+        {
+          primaryNavigation.map((item) => (
+            <li class="[&+li]:mt-[0.55rem]">
+              <a
+                class="text-[var(--color-text-soft)] no-underline hover:text-[var(--color-text)]"
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div>
+      <h3>Service lines</h3>
+      <ul class="m-0 list-none p-0">
+        {
+          serviceNavigation.map((item) => (
+            <li class="[&+li]:mt-[0.55rem]">
+              <a
+                class="text-[var(--color-text-soft)] no-underline hover:text-[var(--color-text)]"
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div>
+      <h3>Contact</h3>
+      <ul class="m-0 list-none p-0">
+        <li>
+          <a
+            class="text-[var(--color-text-soft)] no-underline hover:text-[var(--color-text)]"
+            href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a
+          >
+        </li>
+
+        {
+          settings.phone &&
+            settings.phone.split('/').map((phoneNum, index) => {
+              const trimmedPhone = phoneNum.trim();
+
+              // Skip empty strings resulting from split or trailing separators
+              if (!trimmedPhone) return null;
+
+              return (
+                <li
+                  class={
+                    index === 0
+                      ? 'mt-[0.55rem] [&+li]:mt-[0.55rem]'
+                      : '[&+li]:mt-[0.55rem]'
+                  }
+                >
+                  <a
+                    class="text-[var(--color-text-soft)] no-underline hover:text-[var(--color-text)]"
+                    href={`tel:${trimmedPhone}`}
+                  >
+                    {trimmedPhone}
+                  </a>
+                </li>
+              );
+            })
+        }
+
+        {
+          settings.linkedinUrl && (
+            <li class="[&+li]:mt-[0.55rem]">
+              <a
+                class="text-[var(--color-text-soft)] no-underline hover:text-[var(--color-text)]"
+                href={settings.linkedinUrl}
+              >
+                LinkedIn
+              </a>
+            </li>
+          )
+        }
+      </ul>
+    </div>
+  </div>
+
+  <div
+    class="mx-auto flex w-[min(1120px,calc(100%-2rem))] justify-between gap-4 border-t border-[rgba(15,15,18,0.08)] py-4 pb-8 text-[var(--color-text-soft)] max-[760px]:flex-col"
+  >
+    <p>
+      © {new Date().getFullYear()}
+      {settings.brandName}. All rights reserved.
+    </p>
+  </div>
+</footer>

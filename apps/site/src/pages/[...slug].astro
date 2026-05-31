@@ -1,0 +1,31 @@
+---
+import CmsPageView from '../components/CmsPageView.astro';
+import { getAllPages, getPageByPath, getSiteSetting } from '../lib/cms';
+
+export async function getStaticPaths() {
+  const pages = await getAllPages();
+
+  return pages
+    .filter((page) => page.pathname !== '/')
+    .filter((page) => page.pathname !== '/work')
+    .filter((page) => page.pathname !== '/news')
+    .map((page) => ({
+      params: {
+        slug: page.pathname.replace(/^\//, ''),
+      },
+    }));
+}
+
+const slug = Astro.params.slug || '';
+const pathname = `/${slug}`;
+const [page, settings] = await Promise.all([
+  getPageByPath(pathname),
+  getSiteSetting(),
+]);
+
+if (!page) {
+  throw new Error('Content not found during static generation.');
+}
+---
+
+<CmsPageView page={page} settings={settings} pathname={pathname} />

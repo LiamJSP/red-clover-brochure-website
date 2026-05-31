@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Red Clover Software">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbfaf8"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <circle cx="170" cy="140" r="240" fill="#ea94cc" opacity="0.08"/>
+  <circle cx="1010" cy="520" r="260" fill="#279619" opacity="0.08"/>
+  <path d="M130 170 C320 80, 480 80, 690 180 S 980 280, 1090 210" fill="none" stroke="#601350" stroke-opacity="0.25" stroke-width="4"/>
+  <path d="M160 420 C300 330, 470 340, 650 430 S 920 520, 1050 460" fill="none" stroke="#004e16" stroke-opacity="0.25" stroke-width="4"/>
+  <path d="M200 210 L420 280 L690 240 L940 330" fill="none" stroke="#0f0f12" stroke-opacity="0.15" stroke-width="2"/>
+  <circle cx="200" cy="210" r="14" fill="#601350"/>
+  <circle cx="420" cy="280" r="14" fill="#0f0f12"/>
+  <circle cx="690" cy="240" r="14" fill="#004e16"/>
+  <circle cx="940" cy="330" r="14" fill="#0f0f12"/>
+  <text x="130" y="360" fill="#0f0f12" font-size="76" font-family="Georgia, Cambria, serif" font-weight="700">WordPress that holds up</text>
+  <text x="130" y="435" fill="#0f0f12" font-size="76" font-family="Georgia, Cambria, serif" font-weight="700">under real business pressure.</text>
+  <text x="132" y="500" fill="#601350" font-size="30" font-family="Arial, Helvetica, sans-serif">Red Clover Software · Developer-led studio · Maintenance · Modernization · Partner delivery</text>
+</svg>

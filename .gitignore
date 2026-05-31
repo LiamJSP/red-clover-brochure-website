@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+
+# Env / secrets
+.env
+.env.local
+.env.production
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+apps/site/.env.local
+apps/site/.env.production
+apps/cms/.env
+apps/cms/.env.local
+apps/cms/.env.production
+apps/cms/test.env
+
+# Build / cache
+.next/
+out/
+dist/
+build/
+coverage/
+.cache/
+cache/
+tmp/
+temp/
+.turbo/
+*.tsbuildinfo
+
+# Astro
+apps/site/.astro/
+apps/site/dist/
+
+# Next / Payload
+apps/cms/.next/
+apps/cms/out/
+# Note: apps/cms/src/payload-types.ts is INTENTIONALLY NOT IGNORED 
+# so the Astro CI build can consume the types without booting the CMS.
+
+# Database Dumps
+*.sql
+*.dump
+
+# Infrastructure (AWS CDK)
+infra/cdk.out/
+infra/.jsii
+
+# Optional Docker override
+docker-compose.override.yml

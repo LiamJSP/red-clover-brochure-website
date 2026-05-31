@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ActionLink from '../../components/ActionLink.astro';
+import {
+  getAllCaseStudies,
+  getCaseStudyBySlug,
+  getSiteSetting,
+} from '../../lib/cms';
+import { markdownToHtml } from '../../lib/markdown';
+import { buildPageTitle, formatDate } from '../../lib/utils';
+
+export async function getStaticPaths() {
+  const studies = await getAllCaseStudies();
+
+  return studies.map((study) => ({
+    params: { slug: study.slug },
+  }));
+}
+
+const slug = Astro.params.slug || '';
+const [study, settings] = await Promise.all([
+  getCaseStudyBySlug(slug),
+  getSiteSetting(),
+]);
+
+if (!study) {
+  throw new Error('Content not found during static generation.');
+}
+
+const title = buildPageTitle(study.title, settings);
+const description = study.summary;
+const caseSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: study.title,
+  description: study.summary,
+  datePublished: study.publishedAt,
+  author: {
+    '@type': 'Organization',
+    name: settings.brandName,
+  },
+  url: new URL(`/work/${study.slug}`, settings.siteUrl).toString(),
+};
+---
+
+<BaseLayout
+  settings={settings}
+  pathname={`/work/${study.slug}`}
+  title={title}
+  description={description}
+  type="article"
+  articlePublishedTime={study.publishedAt}
+  jsonLd={caseSchema}
+>
+  <section class="pt-16 pb-12">
+    <div class="mx-auto w-[min(1120px,calc(100%-2rem))] max-w-[54rem]">
+      <p
+        class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-[var(--color-plum)] uppercase"
+      >
+        Work
+      </p>
+      <h1>{study.title}</h1>
+      <p
+        class="max-w-[48rem] text-[clamp(1.1rem,2vw,1.3rem)] text-[var(--color-text-soft)]"
+      >
+        {study.summary}
+      </p>
+
+      <div class="flex flex-wrap gap-[0.7rem] text-[var(--color-text-soft)]">
+        {
+          study.sector && (
+            <span class="inline-flex items-center rounded-full bg-[rgba(15,15,18,0.06)] px-[0.68rem] py-[0.36rem] text-[0.78rem] font-bold text-[var(--color-text)]">
+              {study.sector}
+            </span>
+          )
+        }
+        {study.publishedAt && <span>{formatDate(study.publishedAt)}</span>}
+        {
+          study.isRepresentative && (
+            <span class="inline-flex items-center rounded-full bg-[var(--color-green-soft)] px-[0.68rem] py-[0.36rem] text-[0.78rem] font-bold text-[var(--color-green)]">
+              Representative seed story
+            </span>
+          )
+        }
+      </div>
+
+      {
+        study.services && study.services.length > 0 && (
+          <ul
+            class="mt-[0.9rem] flex list-none flex-wrap gap-[0.55rem] p-0"
+            aria-label="Services"
+          >
+            {study.services.map((service) => (
+              <li class="inline-flex items-center rounded-full bg-[rgba(15,15,18,0.06)] px-[0.68rem] py-[0.36rem] text-[0.78rem] font-bold">
+                {service.label}
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="py-10">
+    <div
+      class="mx-auto grid w-[min(1120px,calc(100%-2rem))] items-start gap-4 min-[981px]:grid-cols-[1.25fr_0.7fr]"
+    >
+      <article
+        class="rounded-[18px] border border-[rgba(15,15,18,0.08)] bg-[rgba(255,255,255,0.9)] p-[1.4rem] shadow-[0_10px_30px_rgba(15,15,18,0.04)]"
+      >
+        <div>
+          <p
+            class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-[var(--color-plum)] uppercase"
+          >
+            Challenge
+          </p>
+          <div
+            class="max-w-[65ch] text-[var(--color-text)] [&_a]:text-[var(--color-plum)] [&_blockquote]:mb-4 [&_blockquote]:ml-0 [&_blockquote]:border-l-[3px] [&_blockquote]:border-l-[rgba(96,19,80,0.25)] [&_blockquote]:pl-4 [&_blockquote]:text-[var(--color-text-soft)] [&_h2]:mb-4 [&_h3]:mb-4 [&_ol]:mb-4 [&_ol]:pl-5 [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:pl-5"
+            set:html={markdownToHtml(study.challenge)}
+          />
+        </div>
+
+        <div
+          class="mt-[1.4rem] border-t border-[rgba(15,15,18,0.08)] pt-[1.3rem]"
+        >
+          <p
+            class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-[var(--color-plum)] uppercase"
+          >
+            Approach
+          </p>
+          <div
+            class="max-w-[65ch] text-[var(--color-text)] [&_a]:text-[var(--color-plum)] [&_blockquote]:mb-4 [&_blockquote]:ml-0 [&_blockquote]:border-l-[3px] [&_blockquote]:border-l-[rgba(96,19,80,0.25)] [&_blockquote]:pl-4 [&_blockquote]:text-[var(--color-text-soft)] [&_h2]:mb-4 [&_h3]:mb-4 [&_ol]:mb-4 [&_ol]:pl-5 [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:pl-5"
+            set:html={markdownToHtml(study.approach)}
+          />
+        </div>
+
+        <div
+          class="mt-[1.4rem] border-t border-[rgba(15,15,18,0.08)] pt-[1.3rem]"
+        >
+          <p
+            class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-[var(--color-plum)] uppercase"
+          >
+            Outcome
+          </p>
+          <div
+            class="max-w-[65ch] text-[var(--color-text)] [&_a]:text-[var(--color-plum)] [&_blockquote]:mb-4 [&_blockquote]:ml-0 [&_blockquote]:border-l-[3px] [&_blockquote]:border-l-[rgba(96,19,80,0.25)] [&_blockquote]:pl-4 [&_blockquote]:text-[var(--color-text-soft)] [&_h2]:mb-4 [&_h3]:mb-4 [&_ol]:mb-4 [&_ol]:pl-5 [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:pl-5"
+            set:html={markdownToHtml(study.outcome)}
+          />
+        </div>
+      </article>
+
+      <aside
+        class="sticky top-[6.2rem] rounded-[18px] border border-[rgba(15,15,18,0.08)] bg-[rgba(255,255,255,0.9)] p-[1.35rem] shadow-[0_10px_30px_rgba(15,15,18,0.04)] max-[980px]:static"
+      >
+        <h2>Need a similar outcome?</h2>
+        <p>
+          Email the scenario or open a discovery call. A brief note about the
+          current site, timeline, and constraints is enough to start.
+        </p>
+        <ActionLink
+          href="/contact"
+          label="Start the conversation"
+          variant="primary"
+        />
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

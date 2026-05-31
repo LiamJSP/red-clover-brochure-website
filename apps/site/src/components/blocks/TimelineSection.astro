@@ -1,0 +1,159 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import type { TimelineBlock } from '../../lib/types';
+
+interface Props {
+  block: TimelineBlock;
+}
+
+const { block } = Astro.props as Props;
+
+const columns = 3;
+const totalItems = block.steps.length;
+const totalRows = Math.ceil(totalItems / columns);
+
+const mappedSteps = block.steps.map((step, index) => {
+  const row = Math.floor(index / columns);
+  const isLtoR = row % 2 === 0;
+  const posInRow = index % columns;
+
+  const isFirstInRow = posInRow === 0;
+  const isLastInRow = posInRow === columns - 1;
+  const isLastItem = index === totalItems - 1;
+  const isLastRow = row === totalRows - 1;
+
+  const gridColumn = isLtoR ? posInRow + 1 : columns - posInRow;
+  const gridRow = row + 1;
+
+  return {
+    ...step,
+    index,
+    isLtoR,
+    isFirstInRow,
+    isLastInRow,
+    isLastItem,
+    isLastRow,
+    gridColumn,
+    gridRow,
+  };
+});
+---
+
+<section class="overflow-hidden py-12">
+  <div class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+    <div class="lg:px-20">
+      <SectionIntro
+        eyebrow={block.eyebrow}
+        heading={block.heading}
+        intro={block.intro}
+      />
+    </div>
+
+    <ol
+      class="m-0 mt-16 grid list-none grid-cols-1 p-0 lg:grid-cols-3 lg:px-20"
+    >
+      {
+        mappedSteps.map((step) => (
+          <li
+            class={`relative flex flex-row gap-6 lg:[grid-column:var(--lg-col)] lg:[grid-row:var(--lg-row)] lg:flex-col lg:gap-0 ${
+              step.isLastRow ? 'pb-0 lg:pb-0' : 'pb-12 lg:pb-24'
+            }`}
+            style={`--lg-col: ${step.gridColumn}; --lg-row: ${step.gridRow};`}
+          >
+            {/* MOBILE VERTICAL LINE */}
+            {!step.isLastItem && (
+              <div class="absolute top-[3.5rem] left-[calc(1.75rem-1px)] z-0 block h-[calc(100%-3.5rem)] w-[2px] bg-[var(--color-plum)] lg:hidden" />
+            )}
+
+            {/* DESKTOP LINES */}
+            {step.isLtoR && !step.isLastInRow && !step.isLastItem && (
+              <div class="absolute top-[calc(1.75rem-1px)] left-[1.75rem] z-0 hidden h-[2px] w-full bg-[var(--color-plum)] lg:block" />
+            )}
+            {!step.isLtoR && !step.isLastInRow && !step.isLastItem && (
+              <div class="absolute top-[calc(1.75rem-1px)] right-[calc(100%-1.75rem)] z-0 hidden h-[2px] w-full bg-[var(--color-plum)] lg:block" />
+            )}
+
+            {/* Desktop U-Turn Loops */}
+            {step.isLtoR && step.isLastInRow && !step.isLastItem && (
+              <div class="absolute top-[calc(1.75rem-1px)] left-[1.75rem] z-0 hidden h-[calc(100%+2px)] w-[calc(100%-1.75rem+3.5rem)] rounded-r-[2.5rem] border-t-[2px] border-r-[2px] border-b-[2px] border-[var(--color-plum)] lg:block" />
+            )}
+            {!step.isLtoR && step.isLastInRow && !step.isLastItem && (
+              <div class="absolute top-[calc(1.75rem-1px)] right-[calc(100%-1.75rem)] z-0 hidden h-[calc(100%+2px)] w-[5.25rem] rounded-l-[2.5rem] border-t-[2px] border-b-[2px] border-l-[2px] border-[var(--color-plum)] lg:block" />
+            )}
+
+            {/* ICON & ARROWS */}
+            <div class="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-[var(--color-plum)] bg-white text-[1.1rem] font-bold text-[var(--color-plum)]">
+              <div class="absolute inset-0 rounded-full bg-[var(--color-plum-soft)]" />
+              <span class="relative z-20">{step.index + 1}</span>
+
+              {step.index > 0 && (
+                <>
+                  {/* MOBILE ARROW */}
+                  <div class="absolute -top-[14px] left-1/2 block -translate-x-1/2 lg:hidden">
+                    <svg
+                      class="h-6 w-6 text-[var(--color-plum)]"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+
+                  {/* DESKTOP ARROWS */}
+                  <div class="absolute inset-0 hidden lg:block">
+                    {step.isLtoR && (
+                      <div class="absolute top-1/2 -left-[14px] -translate-y-1/2">
+                        <svg
+                          class="h-6 w-6 text-[var(--color-plum)]"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M9 18l6-6-6-6" />
+                        </svg>
+                      </div>
+                    )}
+                    {!step.isLtoR && (
+                      <div class="absolute top-1/2 -right-[14px] -translate-y-1/2">
+                        <svg
+                          class="h-6 w-6 text-[var(--color-plum)]"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <path d="M15 18l-6-6 6-6" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* TEXT */}
+            <div class="pt-1 lg:mt-5 lg:max-w-[240px] lg:pt-0">
+              <h3 class="mb-2 text-lg leading-tight font-bold text-gray-900">
+                {step.title}
+              </h3>
+              <p class={`text-sm leading-relaxed text-gray-600 opacity-90 ${
+                step.isLastRow ? '!m-0' : 'm-0'
+              }`}>
+                {step.description}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: payload
+          POSTGRES_USER: payload
+          POSTGRES_PASSWORD: payload
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U payload -d payload"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://payload:payload@localhost:5432/payload
+      PAYLOAD_SECRET: ci-secret-change-me
+      CMS_PUBLIC_URL: http://127.0.0.1:3000
+      SITE_BASE_URL: http://127.0.0.1:4321
+      CORS_ORIGINS: http://127.0.0.1:4321,http://127.0.0.1:3000
+      ADMIN_EMAIL: admin@example.com
+      ADMIN_PASSWORD: ChangeThisNow123!
+      SEED_ON_INIT: 'true'
+      CMS_URL: http://127.0.0.1:3000
+      PUBLIC_SITE_URL: https://example.com
+      PUBLIC_BRAND_NAME: Red Clover Software
+      PUBLIC_CONTACT_EMAIL: hello@example.com
+      PUBLIC_CALENDLY_URL: https://calendly.com/example/discovery
+      PUBLIC_ENABLE_SW_CLEANUP: 'true'
+      PUBLIC_ENABLE_CALENDLY_EMBED: 'false'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Typecheck CMS
+        run: pnpm --filter @red-clover/cms typecheck
+
+      - name: Start CMS in background
+        run: |
+          pnpm --filter @red-clover/cms dev > /tmp/red-clover-cms.log 2>&1 &
+          echo $! > /tmp/red-clover-cms.pid
+
+      - name: Wait for CMS
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl -fsS "http://127.0.0.1:3000/api/globals/site-settings" >/dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "CMS failed to start"
+          cat /tmp/red-clover-cms.log
+          exit 1
+
+      - name: Typecheck Site
+        run: pnpm --filter @red-clover/site typecheck
+
+      - name: Build Site
+        run: pnpm build:site
+
+      - name: Stop CMS
+        if: always()
+        run: |
+          if [ -f /tmp/red-clover-cms.pid ]; then
+            kill "$(cat /tmp/red-clover-cms.pid)" || true
+          fi

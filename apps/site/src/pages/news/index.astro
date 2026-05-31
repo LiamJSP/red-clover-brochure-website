@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import BlockRenderer from '../../components/blocks/BlockRenderer.astro';
+import { getPageByPath, getSiteSetting } from '../../lib/cms';
+import { buildPageTitle } from '../../lib/utils';
+
+// Removed getAllPosts since the Archive block handles the post grid
+const [settings, page] = await Promise.all([
+  getSiteSetting(),
+  getPageByPath('/news'),
+]);
+
+if (!page) {
+  throw new Error('News page not found in Payload CMS.');
+}
+
+const title = buildPageTitle(page.metaTitle || page.title, settings);
+const description =
+  page.metaDescription ||
+  page.summary ||
+  settings.defaultMetaDescription ||
+  settings.tagline;
+
+const pageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: page.title,
+  description,
+  url: new URL('/news', settings.siteUrl).toString(),
+};
+---
+
+<BaseLayout
+  settings={settings}
+  pathname="/news"
+  title={title}
+  description={description}
+  jsonLd={pageSchema}
+>
+  <PageHero page={page} settings={settings} />
+  <BlockRenderer blocks={page.layout || []} />
+</BaseLayout>

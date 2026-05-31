@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Red Clover Software">
+  <rect width="64" height="64" rx="16" fill="#0f0f12"/>
+  <path d="M20 45V19h12.8c7.4 0 12.2 4.8 12.2 11.4 0 7.6-5.4 14.6-15.1 14.6H20Zm8-7h2.8c4.6 0 7.2-3 7.2-7.2 0-3.4-2.4-5.8-6.1-5.8H28v13Z" fill="#ea94cc"/>
+  <path d="M22 48c7.6-1.8 15-2 22 0" stroke="#279619" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>

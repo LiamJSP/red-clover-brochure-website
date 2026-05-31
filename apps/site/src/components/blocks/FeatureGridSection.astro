@@ -1,0 +1,94 @@
+---
+// 1. Added 'flex flex-col' to structure the card vertically.
+// 2. Removed h-full/justify-between logic from the container class and handled spacing via standard margin.
+// 3. Injecting a lightweight script to sync heights on DOM load and window resize.
+
+import SectionIntro from '../SectionIntro.astro';
+import ActionLink from '../ActionLink.astro';
+import type { FeatureGridBlock } from '../../lib/types';
+
+interface Props {
+  block: FeatureGridBlock;
+}
+
+const { block } = Astro.props as Props;
+---
+
+<section class="py-10">
+  <div class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+    <SectionIntro
+      eyebrow={block.eyebrow}
+      heading={block.heading}
+      intro={block.intro}
+    />
+
+    <div
+      id="feature-grid"
+      class="grid grid-cols-1 gap-4 min-[761px]:grid-cols-3"
+    >
+      {
+        block.items.map((item) => (
+          <article class="flex flex-col rounded-[18px] border border-b-[8px] border-[#601350] bg-[rgba(255,255,255,0.9)] p-[1.35rem] shadow-[0_10px_30px_rgba(15,15,18,0.04)]">
+            {/* 2. Added specific classes for the JS script to target */}
+            <h3 class="feature-card-heading text-[1.5rem] font-bold">
+              {item.title}
+            </h3>
+            <p class="feature-card-desc mb-6 text-gray-600">
+              {item.description}
+            </p>
+
+            {item.href && (
+              <ActionLink
+                href={item.href}
+                label={item.linkLabel || 'Learn more'}
+                variant="secondary"
+              />
+            )}
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('feature-grid');
+
+    function syncHeights() {
+      if (!grid) return;
+
+      const headings = grid.querySelectorAll('.feature-card-heading');
+      const paragraphs = grid.querySelectorAll('.feature-card-desc');
+
+      // Reset inline heights first so elements collapse to natural content size
+      headings.forEach((h) => ((h as HTMLElement).style.minHeight = ''));
+      paragraphs.forEach((p) => ((p as HTMLElement).style.minHeight = ''));
+
+      // Sync Headings
+      let maxHeadingHeight = 0;
+      headings.forEach((h) => {
+        const box = h.getBoundingClientRect();
+        if (box.height > maxHeadingHeight) maxHeadingHeight = box.height;
+      });
+      headings.forEach((h) => ((h as HTMLElement).style.minHeight = `${maxHeadingHeight}px`));
+
+      // Sync Paragraphs
+      let maxParaHeight = 0;
+      paragraphs.forEach((p) => {
+        const box = p.getBoundingClientRect();
+        if (box.height > maxParaHeight) maxParaHeight = box.height;
+      });
+      paragraphs.forEach((p) => ((p as HTMLElement).style.minHeight = `${maxParaHeight}px`));
+    }
+
+    syncHeights();
+
+    // Debounced resize listener
+    let timeoutId: ReturnType<typeof setTimeout>;
+    window.addEventListener('resize', () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(syncHeights, 100);
+    });
+  });
+</script>

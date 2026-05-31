@@ -1,0 +1,32 @@
+---
+import PostCard from '../PostCard.astro';
+import SectionIntro from '../SectionIntro.astro';
+import { getAllPosts } from '../../lib/cms';
+import type { Post } from '@red-clover/cms/payload-types';
+
+const { block } = Astro.props;
+
+// Resolve which posts to show based on the Payload block settings
+let postsToDisplay = [];
+if (block.populateBy === 'collection') {
+  const allPosts = await getAllPosts();
+  postsToDisplay = allPosts.slice(0, block.limit || 10);
+} else if (block.populateBy === 'selection') {
+  // Extract relation data if populated individually
+  postsToDisplay = block.selectedDocs || [];
+}
+---
+
+<section class="py-10">
+  <div class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+    <SectionIntro
+      eyebrow={block.eyebrow}
+      heading={block.heading}
+      intro={block.intro}
+    />
+
+    <div class="grid grid-cols-1 gap-4 min-[761px]:grid-cols-3 mt-8">
+      {postsToDisplay.map((post: Post) => <PostCard post={post} />)}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,82 @@
+---
+import { joinUrl } from '../lib/utils';
+import type { SiteSetting } from '@red-clover/cms/payload-types';
+
+interface Props {
+  settings: SiteSetting;
+  title: string;
+  description: string;
+  pathname: string;
+  image?: string;
+  type?: 'website' | 'article';
+  articlePublishedTime?: string | null;
+  jsonLd?: Record<string, unknown>[] | Record<string, unknown> | null;
+}
+
+const {
+  settings,
+  title,
+  description,
+  pathname,
+  image = '/og-default.svg',
+  type = 'website',
+  articlePublishedTime,
+  jsonLd = null,
+} = Astro.props as Props;
+
+const canonical = joinUrl(
+  settings.siteUrl || import.meta.env.PUBLIC_SITE_URL || 'https://example.com',
+  pathname
+);
+const imageUrl = joinUrl(
+  settings.siteUrl || import.meta.env.PUBLIC_SITE_URL || 'https://example.com',
+  image
+);
+const schemas = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: settings.brandName,
+  url: settings.siteUrl,
+  email: settings.contactEmail,
+  description: settings.defaultMetaDescription || settings.tagline,
+  sameAs: settings.linkedinUrl ? [settings.linkedinUrl] : [],
+};
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{title}</title>
+<meta name="description" content={description} />
+<meta name="theme-color" content="#601350" />
+<link rel="canonical" href={canonical} />
+
+<meta property="og:type" content={type} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={imageUrl} />
+<meta property="og:site_name" content={settings.brandName} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
+
+{
+  articlePublishedTime && (
+    <meta property="article:published_time" content={articlePublishedTime} />
+  )
+}
+
+<script
+  is:inline
+  type="application/ld+json"
+  set:html={JSON.stringify(organizationSchema)}
+/>
+{
+  schemas.map((schema) => (
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+  ))
+}

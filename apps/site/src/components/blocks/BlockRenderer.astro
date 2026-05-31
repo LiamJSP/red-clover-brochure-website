@@ -1,0 +1,48 @@
+---
+import type { Page } from '@red-clover/cms/payload-types';
+import MarkdownSection from './MarkdownSection.astro';
+import FeatureGridSection from './FeatureGridSection.astro';
+import BulletListSection from './BulletListSection.astro';
+import TimelineSection from './TimelineSection.astro';
+import CaseStudyHighlightsSection from './CaseStudyHighlightsSection.astro';
+import PricingTiersSection from './PricingTiersSection.astro';
+import FAQSection from './FAQSection.astro';
+import CTABandSection from './CTABandSection.astro';
+import ContactMethodsSection from './ContactMethodsSection.astro';
+import ArchiveBlock from './ArchiveBlock.astro';
+
+interface Props {
+  blocks: any[];
+}
+
+const { blocks } = Astro.props as Props;
+---
+
+{
+  blocks.map((block) => {
+    switch (block.blockType) {
+      case 'markdownSection':
+        return <MarkdownSection block={block} />;
+      case 'featureGrid':
+        return <FeatureGridSection block={block} />;
+      case 'bulletList':
+        return <BulletListSection block={block} />;
+      case 'timeline':
+        return <TimelineSection block={block} />;
+      case 'caseStudyHighlights':
+        return <CaseStudyHighlightsSection block={block} />;
+      case 'pricingTiers':
+        return <PricingTiersSection block={block} />;
+      case 'faq':
+        return <FAQSection block={block} />;
+      case 'ctaBand':
+        return <CTABandSection block={block} />;
+      case 'contactMethods':
+        return <ContactMethodsSection block={block} />;
+      case 'archive':
+        return <ArchiveBlock block={block as any} />;
+      default:
+        return null;
+    }
+  })
+}

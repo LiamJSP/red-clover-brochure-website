@@ -1,0 +1,49 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import { markdownToHtml } from '../../lib/markdown';
+import type { MarkdownSectionBlock } from '../../lib/types';
+
+interface Props {
+  block: MarkdownSectionBlock;
+}
+
+const { block } = Astro.props as Props;
+const html = markdownToHtml(block.content);
+const tone = block.tone || 'default';
+
+const toneClasses = {
+  default: '',
+  muted: 'bg-[rgba(255,255,255,0.6)]',
+  accent:
+    '[background:linear-gradient(180deg,rgba(96,19,80,0.04),rgba(96,19,80,0))]',
+};
+---
+
+<section class:list={['py-10', toneClasses[tone] || '']}>
+  <div class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+    <div
+      class="grid grid-cols-1 items-center gap-8 lg:grid-cols-[1fr_1.2fr] lg:gap-12"
+    >
+      <div>
+        <SectionIntro eyebrow={block.eyebrow} heading={block.heading} />
+        <div
+          class="max-w-[65ch] text-[var(--color-text)] [&_a]:text-[var(--color-plum)] [&_blockquote]:mb-4 [&_blockquote]:ml-0 [&_blockquote]:border-l-[3px] [&_blockquote]:border-l-[rgba(96,19,80,0.25)] [&_blockquote]:pl-4 [&_blockquote]:text-[var(--color-text-soft)] [&_h2]:mb-4 [&_h3]:mb-4 [&_ol]:mb-4 [&_ol]:pl-5 [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:pl-5"
+          set:html={html}
+        />
+      </div>
+
+      {
+        block.backgroundImage && (
+          <div class="relative hidden max-h-[300px] overflow-hidden rounded-lg lg:block lg:max-h-[480px]">
+            <img
+              src={block.backgroundImage.url}
+              alt={block.backgroundImage.alt || 'Business location'}
+              loading="lazy"
+              class="mx-auto h-auto max-h-full w-full object-contain brightness-95 saturate-[0.3]"
+            />
+          </div>
+        )
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,65 @@
+---
+import ActionLink from '../ActionLink.astro';
+import { markdownToHtml } from '../../lib/markdown';
+import type { Page } from '@red-clover/cms/payload-types';
+
+// Extract the specific block type from the union of layout blocks
+type LayoutBlock = NonNullable<Page['layout']>[number];
+type CTABandBlock = Extract<LayoutBlock, { blockType: 'ctaBand' }>;
+
+interface Props {
+  block: CTABandBlock;
+}
+
+const { block } = Astro.props as Props;
+const tone = block.tone || 'plum';
+
+const toneClasses = {
+  plum: '[background:linear-gradient(135deg,rgba(96,19,80,0.94),rgba(96,19,80,0.82))] text-white',
+  green:
+    '[background:linear-gradient(135deg,rgba(0,78,22,0.94),rgba(0,78,22,0.82))] text-white',
+  neutral: 'bg-[var(--color-text)] text-white',
+};
+---
+
+<section class:list={['py-8', tone ? toneClasses[tone as keyof typeof toneClasses] : toneClasses.plum]}>
+  <div
+    class="mx-auto grid w-[min(1120px,calc(100%-2rem))] items-end gap-4 min-[981px]:grid-cols-[1fr_auto]"
+  >
+    <div>
+      {
+        block.eyebrow && (
+          <p class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-inherit uppercase">
+            {block.eyebrow}
+          </p>
+        )
+      }
+      <h2 class="text-inherit">{block.heading}</h2>
+      <div
+        class="max-w-[48ch] text-inherit [&_a]:text-inherit [&_blockquote]:mb-4 [&_blockquote]:ml-0 [&_blockquote]:border-l-[3px] [&_blockquote]:border-l-[rgba(255,255,255,0.28)] [&_blockquote]:pl-4 [&_blockquote]:text-inherit [&_h2]:mb-4 [&_h3]:mb-4 [&_ol]:mb-4 [&_ol]:pl-5 [&_p]:mb-4 [&_ul]:mb-4 [&_ul]:pl-5"
+        set:html={markdownToHtml(block.body)}
+      />
+    </div>
+
+    <div class="flex flex-wrap justify-end gap-[0.8rem]">
+      {
+        block.primaryActionLabel && (
+          <ActionLink
+            href={block.primaryActionHref}
+            label={block.primaryActionLabel}
+            variant="primary"
+          />
+        )
+      }
+      {
+        block.secondaryActionLabel && (
+          <ActionLink
+            href={block.secondaryActionHref}
+            label={block.secondaryActionLabel}
+            variant="ghost"
+          />
+        )
+      }
+    </div>
+  </div>
+</section>

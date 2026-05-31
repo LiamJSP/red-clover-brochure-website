@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from './PageHero.astro';
+import BlockRenderer from './blocks/BlockRenderer.astro';
+import { buildPageTitle } from '../lib/utils';
+import type { Page, SiteSetting } from '@red-clover/cms/payload-types';
+
+interface Props {
+  page: Page;
+  settings: SiteSetting;
+  pathname: string;
+  isHome?: boolean;
+}
+
+const { page, settings, pathname, isHome = false } = Astro.props as Props;
+const title = buildPageTitle(page.metaTitle || page.title, settings, isHome);
+const description =
+  page.metaDescription ||
+  page.summary ||
+  settings.defaultMetaDescription ||
+  settings.tagline;
+
+const webPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': isHome ? 'WebSite' : 'WebPage',
+  name: page.metaTitle || page.title,
+  description,
+  url: new URL(pathname, settings.siteUrl).toString(),
+};
+---
+
+<BaseLayout
+  settings={settings}
+  pathname={pathname}
+  title={title}
+  description={description}
+  jsonLd={webPageSchema}
+>
+  <PageHero page={page} settings={settings} />
+  <BlockRenderer blocks={page.layout || []} />
+</BaseLayout>

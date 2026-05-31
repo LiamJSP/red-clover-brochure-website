@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ActionLink from '../components/ActionLink.astro';
+import { getSiteSetting } from '../lib/cms';
+
+const settings = await getSiteSetting();
+---
+
+<BaseLayout
+  settings={settings}
+  pathname="/404"
+  title={`Page not found | ${settings.brandName}`}
+  description="The page you were looking for could not be found."
+>
+  <section class="pt-16 pb-12">
+    <div class="mx-auto w-[min(1120px,calc(100%-2rem))] max-w-[54rem]">
+      <p
+        class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-[var(--color-plum)] uppercase"
+      >
+        404
+      </p>
+      <h1>That page does not exist.</h1>
+      <p
+        class="max-w-[48rem] text-[clamp(1.1rem,2vw,1.3rem)] text-[var(--color-text-soft)]"
+      >
+        Use the service overview, work page, or contact page to get back on
+        track.
+      </p>
+      <div class="mt-6 flex flex-wrap gap-[0.85rem]">
+        <ActionLink
+          href="/services"
+          label="Explore services"
+          variant="primary"
+        />
+        <ActionLink href="/contact" label="Go to contact" variant="ghost" />
+      </div>
+    </div>
+  </section>
+</BaseLayout>

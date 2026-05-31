@@ -1,0 +1,23 @@
+---
+import type { CaseStudy } from '@red-clover/cms/payload-types';
+
+interface Props {
+  study: CaseStudy;
+}
+
+const { study } = Astro.props as Props;
+---
+
+<article
+  class="rounded-[18px] border border-[rgba(15,15,18,0.08)] bg-[rgba(255,255,255,0.9)] p-[1.35rem] shadow-[0_10px_30px_rgba(15,15,18,0.04)]"
+>
+  <h3><a href={`/work/${study.slug}`}>{study.title}</a></h3>
+  <p>{study.summary}</p>
+
+  <a
+    class="mt-[0.9rem] inline-block font-bold text-[var(--color-plum)] no-underline hover:text-[var(--color-green)]"
+    href={`/work/${study.slug}`}
+  >
+    Read the case story
+  </a>
+</article>

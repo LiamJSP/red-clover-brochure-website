@@ -1,0 +1,60 @@
+name: Deploy Site
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/site/**'
+      - 'scripts/aws/deploy-site.sh'
+      - '.github/workflows/deploy-site.yml'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy-site:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      SITE_BUCKET: ${{ vars.SITE_BUCKET }}
+      CF_DISTRIBUTION_ID: ${{ vars.CF_DISTRIBUTION_ID }}
+      CMS_URL: ${{ vars.CMS_URL }}
+      PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+      PUBLIC_BRAND_NAME: ${{ vars.PUBLIC_BRAND_NAME }}
+      PUBLIC_CONTACT_EMAIL: ${{ vars.PUBLIC_CONTACT_EMAIL }}
+      PUBLIC_CALENDLY_URL: ${{ vars.PUBLIC_CALENDLY_URL }}
+      PUBLIC_ENABLE_SW_CLEANUP: 'true'
+      PUBLIC_ENABLE_CALENDLY_EMBED: 'false'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME_SITE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build site
+        run: pnpm build:site
+
+      - name: Deploy site
+        run: bash scripts/aws/deploy-site.sh

@@ -1,0 +1,34 @@
+---
+interface Props {
+  eyebrow?: string | null;
+  heading?: string | null;
+  intro?: string | null;
+  align?: 'left' | 'center';
+}
+
+const { eyebrow, heading, intro, align = 'left' } = Astro.props as Props;
+
+const wrapperClasses =
+  align === 'center'
+    ? 'mx-auto mb-[1.6rem] max-w-[52rem] text-center'
+    : 'mb-[1.6rem] max-w-[52rem]';
+
+const introClasses =
+  align === 'center'
+    ? 'mx-auto max-w-[48rem] text-[1.05rem] text-[var(--color-text-soft)]'
+    : 'max-w-[48rem] text-[1.05rem] text-[var(--color-text-soft)]';
+---
+
+{
+  (eyebrow || heading || intro) && (
+    <div class={wrapperClasses}>
+      {eyebrow && (
+        <p class="mb-[0.9rem] text-[0.82rem] font-bold tracking-[0.12em] text-[var(--color-plum)] uppercase">
+          {eyebrow}
+        </p>
+      )}
+      {heading && <h2>{heading}</h2>}
+      {intro && <p class={introClasses}>{intro}</p>}
+    </div>
+  )
+}

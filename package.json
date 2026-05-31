@@ -1,0 +1,34 @@
+{
+  "name": "red-clover-brochure-mvp",
+  "private": true,
+  "author": "Red Clover Software",
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "dev": "concurrently --kill-others-on-fail -n cms,site -c magenta,green \"pnpm --filter cms dev\" \"pnpm --filter @red-clover/site dev\"",
+    "dev:cms": "pnpm --filter cms dev",
+    "dev:site": "pnpm --filter @red-clover/site dev",
+    "build": "pnpm --filter cms build && pnpm --filter @red-clover/site build",
+    "build:cms": "pnpm --filter cms build",
+    "build:site": "pnpm --filter @red-clover/site build",
+    "typecheck": "pnpm --filter cms typecheck && pnpm --filter @red-clover/site typecheck",
+    "preview": "pnpm --filter @red-clover/site preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1",
+    "prettier": "^3.8.1",
+    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-tailwindcss": "^0.8.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "esbuild",
+      "unrs-resolver"
+    ]
+  }
+}

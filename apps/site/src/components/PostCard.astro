@@ -1,0 +1,27 @@
+---
+import { formatDate } from '../lib/utils';
+import type { Post } from '@red-clover/cms/payload-types';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props as Props;
+---
+
+<article
+  class="rounded-[18px] border border-[rgba(15,15,18,0.08)] bg-[rgba(255,255,255,0.9)] p-[1.35rem] shadow-[0_10px_30px_rgba(15,15,18,0.04)]"
+>
+  <p class="text-[0.92rem] text-[var(--color-text-soft)]">
+    <span>{formatDate(post.publishedAt)}</span>
+    {post.authorName && <span>· {post.authorName}</span>}
+  </p>
+  <h3><a href={`/news/${post.slug}`}>{post.title}</a></h3>
+  <p>{post.excerpt}</p>
+  <a
+    class="mt-[0.9rem] inline-block font-bold text-[var(--color-plum)] no-underline hover:text-[var(--color-green)]"
+    href={`/news/${post.slug}`}
+  >
+    Read the article
+  </a>
+</article>

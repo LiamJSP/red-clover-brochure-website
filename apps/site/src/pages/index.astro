@@ -1,0 +1,15 @@
+---
+import CmsPageView from '../components/CmsPageView.astro';
+import { getPageByPath, getSiteSetting } from '../lib/cms';
+
+const [page, settings] = await Promise.all([
+  getPageByPath('/'),
+  getSiteSetting(),
+]);
+
+if (!page) {
+  throw new Error('Home page not found in Payload CMS.');
+}
+---
+
+<CmsPageView page={page} settings={settings} pathname="/" isHome={true} />

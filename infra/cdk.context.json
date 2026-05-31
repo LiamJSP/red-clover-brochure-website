@@ -1,0 +1,14 @@
+{
+  "availability-zones:account=807434077491:region=us-east-1": [
+    "us-east-1a",
+    "us-east-1b",
+    "us-east-1c",
+    "us-east-1d",
+    "us-east-1e",
+    "us-east-1f"
+  ],
+  "hosted-zone:account=807434077491:domainName=redcloversoftware.ca:region=us-east-1": {
+    "Id": "/hostedzone/Z04275671DBKK3Z387X6L",
+    "Name": "redcloversoftware.ca."
+  }
+}

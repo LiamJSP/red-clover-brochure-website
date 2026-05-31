@@ -1,0 +1,56 @@
+---
+import SectionIntro from '../SectionIntro.astro';
+import { Icon } from 'astro-icon/components';
+import { getIconName } from '../../lib/icons';
+import type { BulletListBlock } from '../../lib/types';
+
+interface Props {
+  block: BulletListBlock;
+}
+
+const { block } = Astro.props as Props;
+---
+
+<section class="bg-[rgba(255,255,255,0.6)] py-10">
+  <div class="mx-auto w-[min(1120px,calc(100%-2rem))]">
+    <SectionIntro
+      eyebrow={block.eyebrow}
+      heading={block.heading}
+      intro={block.intro}
+    />
+
+    <div class="grid grid-cols-1 gap-4 min-[761px]:grid-cols-2">
+      {
+        block.items.map((item) => {
+          const iconKey = getIconName(item.icon);
+          return (
+            <article class="rounded-[18px] border border-[rgba(15,15,18,0.08)] bg-[rgba(255,255,255,0.9)] px-[1.2rem] py-[1.1rem] shadow-[0_10px_30px_rgba(15,15,18,0.04)]">
+              <div class="flex items-center gap-[0.9rem]">
+                <div class="shrink-0">
+                  {iconKey ? (
+                    <Icon
+                      name={iconKey}
+                      size={40}
+                      class="[color:var(--color-plum)]"
+                    />
+                  ) : (
+                    <span
+                      class="h-10 w-10 rounded-full [background:linear-gradient(135deg,var(--color-plum),var(--color-green))]"
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+                {item.title && <h3 style="margin: 0;">{item.title}</h3>}
+              </div>
+              {item.description && (
+                <p style="margin-top: 1rem; margin-bottom: 0;">
+                  {item.description}
+                </p>
+              )}
+            </article>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
