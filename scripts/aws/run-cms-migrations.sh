@@ -1,3 +1,4 @@
+# scripts/aws/run-cms-migrations.sh
 #!/usr/bin/env bash
 set -euo pipefail
 
@@ -25,7 +26,7 @@ OVERRIDES="$(jq -n --arg name "$ECS_CONTAINER_NAME" '{
 NETWORK_CONFIGURATION="$(jq -n \
   --argjson subnets "$SUBNET_JSON" \
   --argjson securityGroups "$SECURITY_GROUP_JSON" \
-  '{awsvpcConfiguration: {subnets: $subnets, securityGroups: $securityGroups, assignPublicIp: "DISABLED"}}'
+  '{awsvpcConfiguration: {subnets: $subnets, securityGroups: $securityGroups, assignPublicIp: "ENABLED"}}'
 )"
 
 RUN_TASK_JSON="$(aws ecs run-task \
