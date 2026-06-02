@@ -1,4 +1,3 @@
-apps/cms/src/collections/Posts/index.ts
 import type { CollectionConfig } from 'payload'
 
 import {
