@@ -106,7 +106,6 @@ export class RedCloverInfraStack extends cdk.Stack {
 
     const container = taskDefinition.addContainer('CmsContainer', {
       image: ecs.ContainerImage.fromRegistry('python:3.9-alpine'), // Tiny placeholder
-      command: ['python', '-m', 'http.server', '3000'], // Forces a dummy server on port 3000
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'CmsLogs' }),
       environment: {
         NODE_ENV: 'production',
@@ -115,7 +114,7 @@ export class RedCloverInfraStack extends cdk.Stack {
         CORS_ORIGINS: `https://${siteDomain},https://${domainName}`,
       },
       secrets: {
-        DATABASE_URI: ecs.Secret.fromSecretsManager(dbSecret),
+        DATABASE_URL: ecs.Secret.fromSecretsManager(dbSecret, 'url'),
         PAYLOAD_SECRET: ecs.Secret.fromSecretsManager(payloadSecret),
       },
       portMappings: [{ containerPort: 3000 }],
@@ -136,6 +135,7 @@ export class RedCloverInfraStack extends cdk.Stack {
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       securityGroups: [ecsSecurityGroup],
       desiredCount: 1,
+      circuitBreaker: { rollback: true }, // Added Circuit Breaker to prevent long hangs on failed deployments
     });
 
     const alb = new elbv2.ApplicationLoadBalancer(this, 'CmsAlb', {
@@ -153,9 +153,9 @@ export class RedCloverInfraStack extends cdk.Stack {
       port: 80,
       targets: [service],
       healthCheck: { 
-        path: '/',
+        path: '/admin', // Changed from '/' to '/admin' for Payload CMS
         interval: cdk.Duration.seconds(60),
-        healthyHttpCodes: '200-499' // Allows the Python dummy server 404s to pass as "healthy"
+        healthyHttpCodes: '200-499' // Accepts 200 OK, 301 Redirect, 404 Not Found, etc.
       },
     });
 
