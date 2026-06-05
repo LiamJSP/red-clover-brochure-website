@@ -37,6 +37,12 @@ if (process.env.S3_BUCKET && process.env.S3_REGION) {
   )
 }
 
+// Dynamically construct the database connection string
+const dbUrl = process.env.DATABASE_URL || 
+  (process.env.DB_USER && process.env.DB_PASS && process.env.DB_HOST 
+    ? `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:5432/${process.env.DB_NAME || 'payload'}` 
+    : 'postgres://payload:payload@localhost:5432/payload');
+
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || 'development-secret-change-me',
   serverURL: process.env.CMS_PUBLIC_URL || 'http://localhost:3000',
@@ -55,8 +61,7 @@ export default buildConfig({
   globals: [SiteSetting],
   db: postgresAdapter({
     pool: {
-      connectionString:
-        process.env.DATABASE_URL || 'postgres://payload:payload@localhost:5432/payload',
+      connectionString: dbUrl,
     },
     push: process.env.NODE_ENV !== 'production',
     migrationDir: path.resolve(dirname, 'migrations'),

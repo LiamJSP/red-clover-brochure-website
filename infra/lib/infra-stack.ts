@@ -105,7 +105,8 @@ export class RedCloverInfraStack extends cdk.Stack {
     });
 
     const container = taskDefinition.addContainer('CmsContainer', {
-      image: ecs.ContainerImage.fromRegistry('python:3.9-alpine'), // Tiny placeholder
+      // Replaced the python placeholder with your real, pipeline-built image
+      image: ecs.ContainerImage.fromEcrRepository(repository, '5acade6a199b49aad50a2540474f29155051e267'),
       logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'CmsLogs' }),
       environment: {
         NODE_ENV: 'production',
