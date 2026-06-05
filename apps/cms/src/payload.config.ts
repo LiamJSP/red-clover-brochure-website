@@ -38,10 +38,11 @@ if (process.env.S3_BUCKET && process.env.S3_REGION) {
 }
 
 // Dynamically construct the database connection string with safe encoding
-const dbUrl = process.env.DATABASE_URL || 
-  (process.env.DB_USER && process.env.DB_PASS && process.env.DB_HOST 
-    ? `postgres://${encodeURIComponent(process.env.DB_USER)}:${encodeURIComponent(process.env.DB_PASS)}@${process.env.DB_HOST}:5432/${process.env.DB_NAME || 'payload'}` 
-    : 'postgres://payload:payload@localhost:5432/payload');
+const dbUrl =
+  process.env.DATABASE_URL ||
+  (process.env.DB_USER && process.env.DB_PASS && process.env.DB_HOST
+    ? `postgres://${encodeURIComponent(process.env.DB_USER)}:${encodeURIComponent(process.env.DB_PASS)}@${process.env.DB_HOST}:5432/${process.env.DB_NAME || 'payload'}`
+    : 'postgres://payload:payload@localhost:5432/payload')
 
 export default buildConfig({
   secret: process.env.PAYLOAD_SECRET || 'development-secret-change-me',
@@ -62,6 +63,10 @@ export default buildConfig({
   db: postgresAdapter({
     pool: {
       connectionString: dbUrl,
+      // ✅ ADD THIS: Enforce SSL for AWS RDS
+      ssl: process.env.NODE_ENV === 'production' 
+        ? { rejectUnauthorized: false } 
+        : false,
     },
     push: process.env.NODE_ENV !== 'production',
     migrationDir: path.resolve(dirname, 'migrations'),

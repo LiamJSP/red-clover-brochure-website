@@ -104,8 +104,10 @@ export class RedCloverInfraStack extends cdk.Stack {
       cpu: 512,
     });
 
+    const cmsImageTag = this.node.tryGetContext('cmsImageTag') ?? 'latest';
+
     const container = taskDefinition.addContainer('CmsContainer', {
-          image: ecs.ContainerImage.fromEcrRepository(repository, '5acade6a199b49aad50a2540474f29155051e267'),
+          image: ecs.ContainerImage.fromEcrRepository(repository, cmsImageTag),
           logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'CmsLogs' }),
           environment: {
             NODE_ENV: 'production',
@@ -136,11 +138,12 @@ export class RedCloverInfraStack extends cdk.Stack {
     const service = new ecs.FargateService(this, 'CmsService', {
       cluster,
       taskDefinition,
-      assignPublicIp: true, // Required because we are in a public subnet to avoid NAT costs
+      assignPublicIp: true,
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       securityGroups: [ecsSecurityGroup],
       desiredCount: 1,
-      circuitBreaker: { rollback: true }, // Added Circuit Breaker to prevent long hangs on failed deployments
+      minHealthyPercent: 0, // ✅ Prevents deployment hangs on scale-1 services
+      circuitBreaker: { rollback: true },
     });
 
     const alb = new elbv2.ApplicationLoadBalancer(this, 'CmsAlb', {
@@ -155,12 +158,16 @@ export class RedCloverInfraStack extends cdk.Stack {
     });
 
     listener.addTargets('EcsTargets', {
-      port: 80,
       targets: [service],
-      healthCheck: { 
-        path: '/admin', // Changed from '/' to '/admin' for Payload CMS
-        interval: cdk.Duration.seconds(60),
-        healthyHttpCodes: '200-499' // Accepts 200 OK, 301 Redirect, 404 Not Found, etc.
+      port: 3000,
+      protocol: elbv2.ApplicationProtocol.HTTP,
+      healthCheck: {
+        path: '/api/health',
+        interval: cdk.Duration.seconds(30),
+        timeout: cdk.Duration.seconds(5),
+        healthyThresholdCount: 2,
+        unhealthyThresholdCount: 2,
+        healthyHttpCodes: '200',
       },
     });
 
