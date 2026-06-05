@@ -37,10 +37,10 @@ if (process.env.S3_BUCKET && process.env.S3_REGION) {
   )
 }
 
-// Dynamically construct the database connection string
+// Dynamically construct the database connection string with safe encoding
 const dbUrl = process.env.DATABASE_URL || 
   (process.env.DB_USER && process.env.DB_PASS && process.env.DB_HOST 
-    ? `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}:5432/${process.env.DB_NAME || 'payload'}` 
+    ? `postgres://${encodeURIComponent(process.env.DB_USER)}:${encodeURIComponent(process.env.DB_PASS)}@${process.env.DB_HOST}:5432/${process.env.DB_NAME || 'payload'}` 
     : 'postgres://payload:payload@localhost:5432/payload');
 
 export default buildConfig({

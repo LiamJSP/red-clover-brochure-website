@@ -105,21 +105,25 @@ export class RedCloverInfraStack extends cdk.Stack {
     });
 
     const container = taskDefinition.addContainer('CmsContainer', {
-      // Replaced the python placeholder with your real, pipeline-built image
-      image: ecs.ContainerImage.fromEcrRepository(repository, '5acade6a199b49aad50a2540474f29155051e267'),
-      logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'CmsLogs' }),
-      environment: {
-        NODE_ENV: 'production',
-        CMS_PUBLIC_URL: `https://${cmsDomain}`,
-        SITE_BASE_URL: `https://${siteDomain}`,
-        CORS_ORIGINS: `https://${siteDomain},https://${domainName}`,
-      },
-      secrets: {
-        DATABASE_URL: ecs.Secret.fromSecretsManager(dbSecret, 'url'),
-        PAYLOAD_SECRET: ecs.Secret.fromSecretsManager(payloadSecret),
-      },
-      portMappings: [{ containerPort: 3000 }],
-    });
+          image: ecs.ContainerImage.fromEcrRepository(repository, '5acade6a199b49aad50a2540474f29155051e267'),
+          logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'CmsLogs' }),
+          environment: {
+            NODE_ENV: 'production',
+            CMS_PUBLIC_URL: `https://${cmsDomain}`,
+            SITE_BASE_URL: `https://${siteDomain}`,
+            CORS_ORIGINS: `https://${siteDomain},https://${domainName}`,
+            // These stay!
+            DB_HOST: db.instanceEndpoint.hostname,
+            DB_NAME: 'payload',
+          },
+          secrets: {
+            // These stay!
+            DB_USER: ecs.Secret.fromSecretsManager(dbSecret, 'username'),
+            DB_PASS: ecs.Secret.fromSecretsManager(dbSecret, 'password'),
+            PAYLOAD_SECRET: ecs.Secret.fromSecretsManager(payloadSecret),
+          },
+          portMappings: [{ containerPort: 3000 }],
+        });
 
     const albSecurityGroup = new ec2.SecurityGroup(this, 'AlbSg', { vpc });
     albSecurityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
