@@ -35,7 +35,7 @@ UPDATED_TASK_DEF="$(printf '%s' "$CURRENT_TASK_DEF" | jq \
     )
     | .containerDefinitions = (
       .containerDefinitions | map(
-        if .name == $containerName then .image = $image else . end
+        if .name == $containerName then (.image = $image | del(.command)) else . end
       )
     )'
 )"
