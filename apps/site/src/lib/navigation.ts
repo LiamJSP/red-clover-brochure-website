@@ -18,5 +18,5 @@ export const serviceNavigation = [
 
 export const footerNavigation = [
   { href: '/faq', label: 'FAQ' },
-  { href: '/contact', label: 'Contact' },
+  { href: '/contact-us', label: 'Contact' },
 ];

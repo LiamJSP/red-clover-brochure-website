@@ -11,15 +11,32 @@ import {
 } from '../../lib/cms';
 import { buildPageTitle } from '../../lib/utils';
 
-const [settings, studies, page] = await Promise.all([
-  getSiteSetting(),
-  getAllCaseStudies(),
-  getPageByPath('/work'),
-]);
+export async function getStaticPaths() {
+  const [settings, studies, page] = await Promise.all([
+    getSiteSetting(),
+    getAllCaseStudies(),
+    getPageByPath('/work'),
+  ]);
 
-if (!page) {
-  throw new Error('Work page not found in Payload CMS.');
+  if (!page) {
+    return [];
+  }
+
+  return [
+    {
+      params: {
+        index: undefined,
+      },
+      props: {
+        settings,
+        studies,
+        page,
+      },
+    },
+  ];
 }
+
+const { settings, studies, page } = Astro.props;
 
 const title = buildPageTitle(page.metaTitle || page.title, settings);
 const description =
