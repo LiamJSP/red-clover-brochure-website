@@ -23,6 +23,18 @@ export class RedCloverInfraStack extends cdk.Stack {
     const siteDomain = `www.${domainName}`;
     const cmsDomain = `cms.${domainName}`;
 
+    // CDK owns the bootstrap/pinned CMS image tag.
+    // Override with: npx cdk deploy -c cmsImageTag=<git-sha-or-tag>
+    const cmsImageTag = this.node.tryGetContext('cmsImageTag') ?? 'latest';
+
+    // Frontend DNS was restored manually after Route 53 ownership conflicts.
+    // Leave false for the current live environment unless you intentionally want
+    // CDK to create/manage the apex/www A/AAAA records.
+    //
+    // For a true scratch rebuild where these records do not already exist:
+    // npx cdk deploy -c cmsImageTag=<tag> -c manageSiteDns=true
+    const manageSiteDns = this.node.tryGetContext('manageSiteDns') === 'true';
+
     // 1. Networking (Zero NAT Gateway to eliminate idle costs)
     const vpc = new ec2.Vpc(this, 'RedCloverVpc', {
       maxAzs: 2,
@@ -42,7 +54,7 @@ export class RedCloverInfraStack extends cdk.Stack {
       validation: acm.CertificateValidation.fromDns(hostedZone),
     });
 
-    // CloudFront requires a cert in us-east-1
+    // CloudFront requires a cert in us-east-1.
     const siteCert = new acm.DnsValidatedCertificate(this, 'SiteCert', {
       domainName: siteDomain,
       subjectAlternativeNames: [domainName],
@@ -60,7 +72,7 @@ export class RedCloverInfraStack extends cdk.Stack {
     });
 
     const dbSecurityGroup = new ec2.SecurityGroup(this, 'DbSg', { vpc });
-    
+
     const db = new rds.DatabaseInstance(this, 'CmsDatabase', {
       engine: rds.DatabaseInstanceEngine.postgres({ version: rds.PostgresEngineVersion.VER_16 }),
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.T4G, ec2.InstanceSize.MICRO),
@@ -68,64 +80,68 @@ export class RedCloverInfraStack extends cdk.Stack {
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_ISOLATED },
       credentials: rds.Credentials.fromSecret(dbSecret),
       securityGroups: [dbSecurityGroup],
-      multiAz: false, // Cost optimization
+      multiAz: false,
       allocatedStorage: 20,
       deleteAutomatedBackups: true,
-      backupRetention: cdk.Duration.days(1), // Rely on AWS Backup for long-term
+      backupRetention: cdk.Duration.days(1),
     });
 
-    // Backup Plan: Once a month, keep for 3 months
-    // We explicitly name the vault to avoid collisions with orphaned vaults from failed rollbacks
+    // Backup Plan: Once a month, keep for 3 months.
+    // We explicitly name the vault to avoid collisions with orphaned vaults from failed rollbacks.
     const backupVault = new backup.BackupVault(this, 'RedCloverBackupVault', {
-      backupVaultName: 'RedClover-Db-Vault-V2', 
-      removalPolicy: cdk.RemovalPolicy.DESTROY, 
+      backupVaultName: 'RedClover-Db-Vault-V2',
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     const backupPlan = new backup.BackupPlan(this, 'MonthlyDbBackup', {
-      backupVault: backupVault
+      backupVault,
     });
-    
-    backupPlan.addRule(new backup.BackupPlanRule({
-      scheduleExpression: events.Schedule.cron({ minute: '0', hour: '5', day: '1', month: '*' }),
-      deleteAfter: cdk.Duration.days(90),
-    }));
-    backupPlan.addSelection('DbSelection', { resources: [backup.BackupResource.fromRdsDatabaseInstance(db)] });
-    
+
+    backupPlan.addRule(
+      new backup.BackupPlanRule({
+        scheduleExpression: events.Schedule.cron({ minute: '0', hour: '5', day: '1', month: '*' }),
+        deleteAfter: cdk.Duration.days(90),
+      }),
+    );
+
+    backupPlan.addSelection('DbSelection', {
+      resources: [backup.BackupResource.fromRdsDatabaseInstance(db)],
+    });
+
     // 5. ECS, Fargate, and ALB
     const payloadSecret = new secretsmanager.Secret(this, 'PayloadSecret', {
       generateSecretString: { passwordLength: 32 },
     });
 
     const cluster = new ecs.Cluster(this, 'CmsCluster', { vpc });
-    const repository = new ecr.Repository(this, 'CmsRepo', { removalPolicy: cdk.RemovalPolicy.DESTROY });
+
+    const repository = new ecr.Repository(this, 'CmsRepo', {
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
 
     const taskDefinition = new ecs.FargateTaskDefinition(this, 'CmsTaskDef', {
       memoryLimitMiB: 1024,
       cpu: 512,
     });
 
-    const cmsImageTag = this.node.tryGetContext('cmsImageTag') ?? 'latest';
-
     const container = taskDefinition.addContainer('CmsContainer', {
-          image: ecs.ContainerImage.fromEcrRepository(repository, cmsImageTag),
-          logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'CmsLogs' }),
-          environment: {
-            NODE_ENV: 'production',
-            CMS_PUBLIC_URL: `https://${cmsDomain}`,
-            SITE_BASE_URL: `https://${siteDomain}`,
-            CORS_ORIGINS: `https://${siteDomain},https://${domainName}`,
-            // These stay!
-            DB_HOST: db.instanceEndpoint.hostname,
-            DB_NAME: 'payload',
-          },
-          secrets: {
-            // These stay!
-            DB_USER: ecs.Secret.fromSecretsManager(dbSecret, 'username'),
-            DB_PASS: ecs.Secret.fromSecretsManager(dbSecret, 'password'),
-            PAYLOAD_SECRET: ecs.Secret.fromSecretsManager(payloadSecret),
-          },
-          portMappings: [{ containerPort: 3000 }],
-        });
+      image: ecs.ContainerImage.fromEcrRepository(repository, cmsImageTag),
+      logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'CmsLogs' }),
+      environment: {
+        NODE_ENV: 'production',
+        CMS_PUBLIC_URL: `https://${cmsDomain}`,
+        SITE_BASE_URL: `https://${siteDomain}`,
+        CORS_ORIGINS: `https://${siteDomain},https://${domainName}`,
+        DB_HOST: db.instanceEndpoint.hostname,
+        DB_NAME: 'payload',
+      },
+      secrets: {
+        DB_USER: ecs.Secret.fromSecretsManager(dbSecret, 'username'),
+        DB_PASS: ecs.Secret.fromSecretsManager(dbSecret, 'password'),
+        PAYLOAD_SECRET: ecs.Secret.fromSecretsManager(payloadSecret),
+      },
+      portMappings: [{ containerPort: 3000 }],
+    });
 
     const albSecurityGroup = new ec2.SecurityGroup(this, 'AlbSg', { vpc });
     albSecurityGroup.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
@@ -142,7 +158,7 @@ export class RedCloverInfraStack extends cdk.Stack {
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC },
       securityGroups: [ecsSecurityGroup],
       desiredCount: 1,
-      minHealthyPercent: 0, // ✅ Prevents deployment hangs on scale-1 services
+      minHealthyPercent: 0,
       circuitBreaker: { rollback: true },
     });
 
@@ -171,7 +187,10 @@ export class RedCloverInfraStack extends cdk.Stack {
       },
     });
 
-    alb.addListener('HttpListener', { port: 80, defaultAction: elbv2.ListenerAction.redirect({ port: '443' }) });
+    alb.addListener('HttpListener', {
+      port: 80,
+      defaultAction: elbv2.ListenerAction.redirect({ port: '443' }),
+    });
 
     // CMS DNS Record
     new route53.ARecord(this, 'CmsDnsRecord', {
@@ -188,11 +207,43 @@ export class RedCloverInfraStack extends cdk.Stack {
 
     const responseHeadersPolicy = new cloudfront.ResponseHeadersPolicy(this, 'SecurityHeaders', {
       securityHeadersBehavior: {
-        strictTransportSecurity: { accessControlMaxAge: cdk.Duration.days(365), includeSubdomains: true, override: true },
+        strictTransportSecurity: {
+          accessControlMaxAge: cdk.Duration.days(365),
+          includeSubdomains: true,
+          override: true,
+        },
         contentTypeOptions: { override: true },
-        frameOptions: { frameOption: cloudfront.HeadersFrameOption.DENY, override: true },
-        xssProtection: { protection: true, modeBlock: true, override: true },
+        frameOptions: {
+          frameOption: cloudfront.HeadersFrameOption.DENY,
+          override: true,
+        },
+        xssProtection: {
+          protection: true,
+          modeBlock: true,
+          override: true,
+        },
       },
+    });
+
+    const cleanUrlRewriteFunction = new cloudfront.Function(this, 'CleanUrlRewriteFunction', {
+      code: cloudfront.FunctionCode.fromInline(`
+function handler(event) {
+  var request = event.request;
+  var uri = request.uri;
+
+  if (uri.endsWith('/')) {
+    request.uri = uri + 'index.html';
+    return request;
+  }
+
+  if (!uri.includes('.')) {
+    request.uri = uri + '/index.html';
+    return request;
+  }
+
+  return request;
+}
+      `),
     });
 
     const distribution = new cloudfront.Distribution(this, 'SiteDistribution', {
@@ -201,6 +252,12 @@ export class RedCloverInfraStack extends cdk.Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
         responseHeadersPolicy,
+        functionAssociations: [
+          {
+            function: cleanUrlRewriteFunction,
+            eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+          },
+        ],
       },
       domainNames: [siteDomain, domainName],
       certificate: siteCert,
@@ -209,32 +266,52 @@ export class RedCloverInfraStack extends cdk.Stack {
       errorResponses: [{ httpStatus: 404, responsePagePath: '/404.html' }],
     });
 
-    // Site DNS Records (Overwriting the existing Gatsby records)
-    new route53.ARecord(this, 'SiteWwwRecord', {
-      zone: hostedZone,
-      recordName: 'www',
-      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
-      deleteExisting: true, 
+    if (manageSiteDns) {
+      new route53.ARecord(this, 'SiteWwwRecord', {
+        zone: hostedZone,
+        recordName: 'www',
+        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+      });
+
+      new route53.ARecord(this, 'SiteApexRecord', {
+        zone: hostedZone,
+        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+      });
+
+      new route53.AaaaRecord(this, 'SiteWwwIpv6Record', {
+        zone: hostedZone,
+        recordName: 'www',
+        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+      });
+
+      new route53.AaaaRecord(this, 'SiteApexIpv6Record', {
+        zone: hostedZone,
+        target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+      });
+    }
+
+    new cdk.CfnOutput(this, 'CmsUrl', {
+      value: `https://${cmsDomain}`,
     });
 
-    new route53.ARecord(this, 'SiteApexRecord', {
-      zone: hostedZone,
-      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
-      deleteExisting: true, 
+    new cdk.CfnOutput(this, 'SiteUrl', {
+      value: `https://${domainName}`,
     });
 
-    // IPv6 Records (Overwriting if they exist)
-    new route53.AaaaRecord(this, 'SiteWwwIpv6Record', {
-      zone: hostedZone,
-      recordName: 'www',
-      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
-      deleteExisting: true,
+    new cdk.CfnOutput(this, 'SiteWwwUrl', {
+      value: `https://${siteDomain}`,
     });
 
-    new route53.AaaaRecord(this, 'SiteApexIpv6Record', {
-      zone: hostedZone,
-      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
-      deleteExisting: true,
+    new cdk.CfnOutput(this, 'SiteDistributionId', {
+      value: distribution.distributionId,
+    });
+
+    new cdk.CfnOutput(this, 'SiteDistributionDomainName', {
+      value: distribution.distributionDomainName,
+    });
+
+    new cdk.CfnOutput(this, 'CmsEcrRepositoryName', {
+      value: repository.repositoryName,
     });
   }
 }

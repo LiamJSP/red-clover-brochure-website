@@ -1,0 +1,108 @@
+[
+    {
+        "Name": "redcloversoftware.ca.",
+        "Type": "A",
+        "AliasTarget": {
+            "HostedZoneId": "Z2FDTNDATAQYW2",
+            "DNSName": "d1vxc38g04od26.cloudfront.net.",
+            "EvaluateTargetHealth": false
+        }
+    },
+    {
+        "Name": "redcloversoftware.ca.",
+        "Type": "AAAA",
+        "AliasTarget": {
+            "HostedZoneId": "Z2FDTNDATAQYW2",
+            "DNSName": "d1vxc38g04od26.cloudfront.net.",
+            "EvaluateTargetHealth": false
+        }
+    },
+    {
+        "Name": "redcloversoftware.ca.",
+        "Type": "MX",
+        "TTL": 900,
+        "ResourceRecords": [
+            {
+                "Value": "10 mail.protonmail.ch"
+            },
+            {
+                "Value": "20 mailsec.protonmail.ch"
+            }
+        ]
+    },
+    {
+        "Name": "redcloversoftware.ca.",
+        "Type": "NS",
+        "TTL": 172800,
+        "ResourceRecords": [
+            {
+                "Value": "ns-1810.awsdns-34.co.uk."
+            },
+            {
+                "Value": "ns-730.awsdns-27.net."
+            },
+            {
+                "Value": "ns-1118.awsdns-11.org."
+            },
+            {
+                "Value": "ns-7.awsdns-00.com."
+            }
+        ]
+    },
+    {
+        "Name": "redcloversoftware.ca.",
+        "Type": "SOA",
+        "TTL": 900,
+        "ResourceRecords": [
+            {
+                "Value": "ns-1810.awsdns-34.co.uk. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+            }
+        ]
+    },
+    {
+        "Name": "redcloversoftware.ca.",
+        "Type": "TXT",
+        "TTL": 900,
+        "ResourceRecords": [
+            {
+                "Value": "\"protonmail-verification=8bacb22704923609a5556fadf9e7ae367b974ac5\""
+            },
+            {
+                "Value": "\"v=spf1 include:_spf.protonmail.ch mx ~all\""
+            },
+            {
+                "Value": "\"google-site-verification=6yzqARH6kF-edaCF9limv1Qyhzcq-rOrja-qf7ttxi8\""
+            },
+            {
+                "Value": "\"MS=ms11159795\""
+            },
+            {
+                "Value": "\"google-site-verification=Ugez9gqtwW09FzQpKp0xptagRAr-WjKP_g__1E7fnT8\""
+            },
+            {
+                "Value": "\"openai-domain-verification=dv-UJmI0cZqvCSHQnRz1DrOB2FN\""
+            },
+            {
+                "Value": "\"google-site-verification=bmISwaZ5xg-UxM3_bozOZh_qLPJJb0VOYmVVLYcR5Kk\""
+            }
+        ]
+    },
+    {
+        "Name": "www.redcloversoftware.ca.",
+        "Type": "A",
+        "AliasTarget": {
+            "HostedZoneId": "Z2FDTNDATAQYW2",
+            "DNSName": "d1vxc38g04od26.cloudfront.net.",
+            "EvaluateTargetHealth": false
+        }
+    },
+    {
+        "Name": "www.redcloversoftware.ca.",
+        "Type": "AAAA",
+        "AliasTarget": {
+            "HostedZoneId": "Z2FDTNDATAQYW2",
+            "DNSName": "d1vxc38g04od26.cloudfront.net.",
+            "EvaluateTargetHealth": false
+        }
+    }
+]
